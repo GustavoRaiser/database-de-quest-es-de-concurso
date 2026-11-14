@@ -1,0 +1,36 @@
+{
+  "formato": "base-questoes",
+  "versao": 1,
+  "codificacao": "UTF-8",
+  "registros": "jsonl",
+  "campos": [
+    "situacao",
+    "enunciado",
+    "assertivas"
+  ],
+  "situacoes": {
+    "0": "atualizada",
+    "1": "desatualizada",
+    "2": "anulada"
+  },
+  "identificacao": {
+    "estrutura": [
+      "orgao",
+      "cargo",
+      "disciplina",
+      "tema",
+      "linha"
+    ],
+    "separador": ".",
+    "linha_inicial": 1,
+    "linha_base": 10,
+    "base_catalogos": 62,
+    "alfabeto_catalogos": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+    "escopo_catalogos": "por_pai",
+    "diferencia_maiusculas": true
+  },
+  "catalogos": "catalogos.json",
+  "indice": "indice.json",
+  "diretorio_dados": "dados",
+  "caminho_tema": "dados/{orgao}/{cargo}/{disciplina}/{tema}.jsonl"
+}

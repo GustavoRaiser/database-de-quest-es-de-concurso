@@ -1,0 +1,14 @@
+{
+  "orgaos": {
+    "N32": "Órgão fictício"
+  },
+  "cargos": {
+    "N32.a2": "Cargo fictício"
+  },
+  "disciplinas": {
+    "N32.a2.5": "Disciplina de exemplo"
+  },
+  "temas": {
+    "N32.a2.5.y": "Tema de exemplo"
+  }
+}
