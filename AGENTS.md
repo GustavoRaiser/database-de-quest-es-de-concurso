@@ -16,6 +16,7 @@ As instruções deste arquivo se aplicam ao repositório inteiro. AGENTS.md loca
 ## Separação de responsabilidades
 
 - organizador/: estrutura, armazenamento definitivo, metadados, recursos, procedência, validação e consulta.
+- emissor/: apresentação, filtros e API de leitura; não modifica o acervo.
 - digitalizador/: extração de conteúdo de fontes, reconstrução de layout, OCR, preparação de texto/HTML e relatórios de extração.
 - Raiz: apenas navegação, arquitetura, contratos e configurações realmente globais. Não colocar ferramentas de um agente na raiz.
 - Código, testes, dependências, exemplos e instruções específicos pertencem à pasta do respectivo agente.
@@ -44,3 +45,7 @@ As instruções deste arquivo se aplicam ao repositório inteiro. AGENTS.md loca
 ## Novos agentes
 
 Ao criar um novo trabalho independente, criar uma pasta com nome descritivo e pelo menos README.md (missão, entradas, saídas, estado), AGENTS.md (limites e regras) e PLANEJAMENTO.md. Incluir código e testes somente quando implementados. Atualizar o mapa da raiz e o contrato de comunicação. Evitar uma pasta genérica que reúna funções de vários agentes.
+
+## Situação e revisão
+
+A desatualização é declarada manualmente pelo usuário. Manter suporte às situações e seus metadados; não criar uma etapa obrigatória de revisão jurídica ou atualização automática. Verificações técnicas de extração, integridade e referências continuam pertencendo às ferramentas responsáveis.

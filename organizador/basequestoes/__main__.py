@@ -5,6 +5,7 @@ import json
 import sys
 
 from .core import Base, Erro, ler_json
+from .emissao import emitir, FILTROS
 
 
 def main():
@@ -12,6 +13,12 @@ def main():
     parser.add_argument("--base", default=".", help="pasta que contém manifesto.json")
     sub = parser.add_subparsers(dest="comando", required=True)
     sub.add_parser("validar")
+    sub.add_parser("catalogos")
+    emissao = sub.add_parser("emitir")
+    for campo in FILTROS:
+        emissao.add_argument("--" + campo, default="")
+    emissao.add_argument("--pagina", type=int, default=1)
+    emissao.add_argument("--por-pagina", type=int, default=20)
     consultar = sub.add_parser("consultar")
     consultar.add_argument("id")
     recurso = sub.add_parser("guardar-recurso")
@@ -27,6 +34,10 @@ def main():
         base = Base(args.base)
         if args.comando == "validar":
             resultado = base.validar()
+        elif args.comando == "catalogos":
+            resultado = base.catalogos
+        elif args.comando == "emitir":
+            resultado = emitir(base, {campo: getattr(args, campo) for campo in FILTROS}, args.pagina, args.por_pagina)
         elif args.comando == "consultar":
             resultado = base.consultar(args.id)
         elif args.comando == "guardar-recurso":

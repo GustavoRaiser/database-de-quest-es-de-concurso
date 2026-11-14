@@ -85,3 +85,14 @@ A migração altera os manifestos; não altera as linhas das questões. O índic
 O Organizador é responsável pelo formato, armazenamento, referências, integridade e consulta da base. Código, testes, exemplos e instruções específicos ficam nesta pasta. Leia também [AGENTS.md](AGENTS.md), a [arquitetura global](../ARQUITETURA.md) e os [contratos entre módulos](../CONTRATOS.md).
 
 Extração de PDF, OCR e tratamento de HTML pertencem ao Digitalizador em ../digitalizador/. O módulo Digitalizador ainda não tem implementação. Os comandos atuais do Organizador continuam sem incluir questões novas ou alterar situações; esses recursos permanecem planejados.
+
+## Consulta pública para o Emissor
+
+Na pasta organizador/:
+
+```sh
+python -m basequestoes --base exemplos/base catalogos
+python -m basequestoes --base exemplos/base emitir --orgao N32 --pagina 1 --por-pagina 20
+```
+
+Filtros opcionais: --orgao, --cargo, --disciplina e --tema, com chaves completas dos catálogos. Sem filtros, inclui toda a base, paginada. A resposta inclui classificação legível e metadados. Ver [Emissor](../emissor/README.md) e o [contrato global](../CONTRATOS.md).

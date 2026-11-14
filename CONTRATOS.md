@@ -40,3 +40,11 @@ Quem consumir uma questão completa deve usar o leitor do Organizador ou reprodu
 ## 5. Mudanças
 
 Alterar o armazenamento exige atualizar especificações, manifesto e testes do Organizador conforme o impacto. Alterar a entrega de extração exige versionar o contrato intermediário do Digitalizador. Uma alteração não deve mudar silenciosamente o formato do outro módulo.
+
+## 6. Organizador → Emissor → ferramentas do usuário
+
+A CLI pública do Organizador oferece catalogos e emitir. emitir aceita --orgao, --cargo, --disciplina e --tema com as chaves completas dos respectivos catálogos, além de --pagina e --por-pagina. Filtros vazios são omitidos e os preenchidos se combinam por interseção. Nenhum filtro significa toda a base, com paginação. A resposta JSON traz itens, total, pagina, por_pagina e paginas. Cada item reúne id, questao, metadados e classificacao.
+
+O Emissor consome essa interface por subprocesso sem shell e publica /api/catalogos e /api/questoes, documentados em emissor/README.md. Recursos seguem o contrato local de SHA-256. Operações são de leitura; não acrescentam questões nem alteram situações. Ferramentas próprias podem consumir a CLI, a API local ou o formato documentado diretamente.
+
+A desatualização é declarada pelo usuário. Não existe revisão jurídica obrigatória nem monitoramento automático de atualidade neste fluxo.

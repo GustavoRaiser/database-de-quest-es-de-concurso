@@ -29,14 +29,14 @@ Digitalizador: extração + procedência + pendências
                   ↓
 Entrega intermediária, ainda sem ID local definitivo
                   ↓
-Revisão da fidelidade, classificação e situação
+Preparação técnica e classificação; situação informada pelo usuário
                   ↓
 Organizador: validação + armazenamento + ID local por linha
                   ↓
-Consulta conjunta de questão, metadados e recursos
+Emissor: consulta e visualização conjunta de questão, metadados e recursos
 ```
 
-As etapas futuras de extração e inclusão não estão ligadas por automação hoje. O contrato de entrega deve ser implementado antes dessa conexão. A revisão é uma etapa do fluxo, ainda sem módulo separado; não inventar um agente implementado para ela.
+As etapas futuras de extração e inclusão não estão ligadas por automação hoje. O contrato de entrega deve ser implementado antes dessa conexão. Não há etapa obrigatória de revisão jurídica nem agente de atualização automática. A desatualização é informada manualmente pelo usuário.
 
 ## Organização física de um tema
 
@@ -51,3 +51,7 @@ Não há pasta TEMA na versão 3. Não há ID explícito em cada linha de quest�
 ## Regra de propriedade
 
 Uma função deve ter um responsável principal. Extração pertence ao Digitalizador; organização definitiva pertence ao Organizador. Interfaces e contratos podem ser compartilhados, mas implementações e instruções específicas permanecem nas respectivas pastas. A raiz registra decisões globais, sem se tornar uma terceira ferramenta genérica.
+
+## Emissor
+
+Pasta emissor/: interface no navegador e API JSON de leitura, com filtros opcionais de órgão, cargo, disciplina e tema. Sem filtros, toda a base participa da consulta paginada. Inclui metadados, textos de apoio e recursos; mostra a situação como cadastrada. Usa a CLI pública do Organizador, sem importar seu código interno. Já implementado para execução local, sem hospedagem automática pelo GitHub.

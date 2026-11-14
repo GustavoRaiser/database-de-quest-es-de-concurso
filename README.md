@@ -7,6 +7,7 @@ Este repositório é organizado como uma empresa: cada pasta de trabalho represe
 | Pasta | Agente | Responsabilidade | Estado |
 |---|---|---|---|
 | [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI e testes implementados; algumas funções de escrita ainda planejadas |
+| [emissor/](emissor/README.md) | Emissor | Visualização com filtros e API JSON para ferramentas próprias | Implementado |
 | [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | Estrutura e instruções preparadas; processamento ainda não implementado |
 
 ## Estrutura
@@ -27,6 +28,13 @@ organizador/
     catalogos.json
     indice.json
     exemplos/base/      # base fictícia independente
+emissor/
+    AGENTS.md
+    README.md
+    PLANEJAMENTO.md
+    servidor.py
+    web/
+    tests/
 digitalizador/
     AGENTS.md
     README.md
@@ -59,3 +67,13 @@ Para iniciar qualquer trabalho, ler [AGENTS.md](AGENTS.md), [ARQUITETURA.md](ARQ
 ## Mudança de localização
 
 O conteúdo que antes ficava na raiz agora está em organizador/. Após atualizar seu clone, execute os comandos dentro dessa pasta. O formato dos dados continua na versão 3: esta reorganização não altera o conteúdo dos manifestos, registros, metadados ou recursos. O Digitalizador permanece sem código de processamento.
+
+## Visualizar questões
+
+Na raiz do repositório:
+
+```sh
+python emissor/servidor.py --base organizador/exemplos/base
+```
+
+Abra http://127.0.0.1:8000. Para consultar o acervo real, use `--base organizador` (ainda vazio). Todos os filtros são opcionais; sem filtros, toda a base é consultada, com paginação. Veja [Emissor](emissor/README.md) para uso da API em uma ferramenta própria.

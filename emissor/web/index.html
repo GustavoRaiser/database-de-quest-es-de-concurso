@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Emissor · Questões</title><link rel="stylesheet" href="/style.css">
+<body><main>
+<header><p class="marca">ACERVO DE QUESTÕES</p><h1>Emissor</h1><p>Explore toda a base ou combine filtros para encontrar suas questões.</p></header>
+<form id="filtros"><div class="grade">
+<label>Órgão<select id="orgao" name="orgao"><option value="">Todos</option></select></label>
+<label>Cargo<select id="cargo" name="cargo"><option value="">Todos</option></select></label>
+<label>Disciplina<select id="disciplina" name="disciplina"><option value="">Todas</option></select></label>
+<label>Tema<select id="tema" name="tema"><option value="">Todos</option></select></label>
+</div><div class="acoes"><button type="submit">Aplicar filtros</button><button type="button" id="limpar" class="secundario">Limpar filtros</button><label>Por página <select id="tamanho"><option>20</option><option>50</option><option>100</option></select></label></div></form>
+<p id="aviso" role="status" aria-live="polite">Carregando questões…</p>
+<section id="questoes" aria-label="Questões"></section>
+<nav aria-label="Paginação"><button id="anterior" class="secundario">Anterior</button><span id="pagina"></span><button id="proxima" class="secundario">Próxima</button></nav>
+</main><script src="/app.js"></script></body></html>
