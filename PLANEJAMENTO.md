@@ -2,15 +2,17 @@
 
 ## Estado inicial
 
-Formato e exemplos documentados. Ainda não há CLI, aplicação, importador ou validador executável. A base principal está vazia.
+Formato 2, exemplos e CLI em Python implementados. Já existem leitura, validação, consulta com metadados, armazenamento de recursos por hash, registro de metadados e registro de lotes de questões existentes. A base principal continua vazia.
+
+Ainda não há extrator de PDF, adaptador da Quest API, conversor/sanitizador de HTML, cadastro de categorias, inclusão de questões ou atualização de situação por comando. O registro de lote não faz essas importações.
 
 ## Etapa 1 — Preparar ambiente e fixar o contrato
 
 - Clonar o repositório.
 - Verificar a distinção entre nomes maiúsculos e minúsculos no volume local.
 - Ler ESPECIFICACAO.md e usar exemplos/base como amostra independente.
-- Escolher a linguagem e a interface inicial. Uma CLI em Python com biblioteca padrão é uma opção simples, ainda não uma exigência.
-- Manter a versão 1 e as posições dos campos alinhadas ao manifesto.
+- Escolher a linguagem e a interface inicial. A CLI atual usa Python 3.10 ou superior, sem dependências externas.
+- Manter a versão 2 e as posições dos campos alinhadas ao manifesto.
 
 Resultado: ambiente capaz de ler os arquivos de exemplo sem mudar sua estrutura.
 
@@ -71,7 +73,7 @@ Somente depois decidir se vale acrescentar índice de bytes, divisão de temas, 
 
 ## Comandos previstos
 
-Nomes ilustrativos, ainda não implementados:
+Operações planejadas; consultar README.md para os comandos já disponíveis:
 
 | Operação | Entrada | Saída |
 |---|---|---|
@@ -85,7 +87,7 @@ Nomes ilustrativos, ainda não implementados:
 
 ## Fora do escopo inicial
 
-Gabaritos, comentários, datas de prova, imagens, histórico de situações, movimentação de questões, correção textual, sincronização entre várias bases e deduplicação automática. Essas funções exigem decisões de formato antes da implementação.
+Comentários, histórico de situações, movimentação de questões, correção textual, sincronização entre várias bases, deduplicação semântica, extração de PDF, conversão de HTML e integração remota. Gabaritos, procedência e imagens locais já possuem estrutura e validação em METADADOS.md.
 
 ## Cuidados operacionais
 

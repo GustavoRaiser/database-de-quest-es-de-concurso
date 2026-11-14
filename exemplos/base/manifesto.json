@@ -1,6 +1,6 @@
 {
   "formato": "base-questoes",
-  "versao": 1,
+  "versao": 2,
   "codificacao": "UTF-8",
   "registros": "jsonl",
   "campos": [
@@ -32,5 +32,9 @@
   "catalogos": "catalogos.json",
   "indice": "indice.json",
   "diretorio_dados": "dados",
-  "caminho_tema": "dados/{orgao}/{cargo}/{disciplina}/{tema}.jsonl"
+  "caminho_tema": "dados/{orgao}/{cargo}/{disciplina}/{tema}.jsonl",
+  "versao_metadados": 1,
+  "diretorio_metadados": "metadados",
+  "diretorio_recursos": "recursos",
+  "diretorio_importacoes": "importacoes"
 }

@@ -1,4 +1,6 @@
-# Especificação do formato — versão 1
+# Especificação do formato — versão 2
+
+A versão 2 mantém os registros e IDs anteriores e acrescenta a camada definida em [METADADOS.md](METADADOS.md). Ela contém o contrato de recursos, HTML original, gabaritos e procedência.
 
 ## 1. Escopo
 
@@ -57,7 +59,7 @@ Exemplo de uma linha:
 [0,"Assinale a alternativa correta.",["Primeira assertiva.","Segunda assertiva."]]
 ```
 
-A quantidade de assertivas é livre, inclusive zero. Não há campos de gabarito, fonte, data, banca ou tipo de questão na versão 1. Ferramentas não devem inferir esses dados a partir da situação ou da posição das assertivas.
+A quantidade de assertivas é livre, inclusive zero. Não há campos de gabarito, fonte, data, banca ou tipo de questão na linha principal; os complementos pertencem aos metadados da versão 2. Ferramentas não devem inferir esses dados a partir da situação ou da posição das assertivas.
 
 ### Serialização e linhas
 
@@ -80,7 +82,7 @@ Inclusões acrescentam registros somente ao final. Nenhuma operação pode apaga
 
 Correções de enunciado ou assertivas ainda não têm procedimento definido e devem ser recusadas pela ferramenta inicial. Não alterar o texto silenciosamente.
 
-Renomear uma categoria no catálogo preserva seu código. Mover registros ou renomear códigos e caminhos altera sua identidade; essas operações ficam fora da primeira versão.
+Renomear uma categoria no catálogo preserva seu código. Mover registros ou renomear códigos e caminhos altera sua identidade; essas operações continuam fora do escopo implementado.
 
 Para gravar: validar primeiro, obter exclusividade por arquivo e impedir que inclusões e atualizações concorrentes percam dados. Atualizações de situação devem escrever um arquivo temporário no mesmo volume, verificar o resultado e substituí-lo com segurança. Não truncar o original antes de concluir a nova gravação. Uma operação sobre catálogo e índice também precisa prever recuperação de falhas.
 
@@ -113,7 +115,7 @@ O índice é derivado: pode ser reconstruído percorrendo os arquivos válidos e
 
 ## 7. Manifesto
 
-`manifesto.json` declara formato, versão, codificação, campos, situações, regras dos IDs e localização dos arquivos. Sua versão inicial é 1. Uma ferramenta deve rejeitar versões ou regras que não suporte, sem tentar adivinhar sua interpretação.
+`manifesto.json` declara formato, versão, codificação, campos, situações, regras dos IDs e localização dos arquivos. A versão atual é 2; o contrato auxiliar é declarado por versao_metadados: 1. Uma ferramenta deve rejeitar versões ou regras que não suporte, sem tentar adivinhar sua interpretação.
 
 O alfabeto configurado identifica a base 62 acordada; não autoriza alterar códigos existentes. Qualquer evolução incompatível exige um procedimento de migração e revisão da versão.
 
@@ -131,7 +133,7 @@ Consultar por nome exige primeiro buscar no catálogo. Listar um tema consiste e
 
 Importação recebe o tema de destino e registros no formato de três campos. Deve validar o lote antes de acrescentá-lo e retornar o intervalo de linhas efetivamente cadastrado. Repetir uma importação pode duplicar conteúdo: detecção de repetição deve avisar, sem excluir ou fundir questões automaticamente. IDs fornecidos por outra base não devem ser preservados implicitamente ao anexar registros.
 
-O formato com `;;` não é uma entrada oficial da versão 1. Um adaptador futuro deverá definir suas regras de escape antes de aceitá-lo.
+O formato com `;;` não é uma entrada oficial do formato atual. Um adaptador futuro deverá definir suas regras de escape antes de aceitá-lo.
 
 ## 9. Validação e diagnósticos
 
@@ -141,12 +143,16 @@ Rejeitar JSON com chaves duplicadas nos arquivos de controle. Em JSONL, rejeitar
 
 Não pular linhas inválidas: elas ocupam posições e pular sua contagem alteraria a identificação. Não reparar arquivos apagando linhas vazias. A ferramenta deve interromper a operação de gravação e exigir diagnóstico.
 
-## 10. Limites e extensões
+## 10. Metadados e recursos
+
+Consulte [METADADOS.md](METADADOS.md). Arquivos de metadados usam o mesmo caminho de tema em metadados/, com número explícito da questão em cada objeto. Recursos são locais, nomeados pelo SHA-256 completo. Lotes guardam manifesto e relatório com correspondência entre número original e ID local. O índice central continua restrito aos temas.
+
+## 11. Limites e extensões
 
 Arquivos por tema facilitam a localização, mas não garantem tamanho máximo. Consulta por linha ainda percorre os bytes anteriores, salvo uso de índice auxiliar.
 
 Índices de posições em bytes são opcionais e reconstruíveis. Uma mudança de situação pode mudar o tamanho em bytes do registro; invalidar ou reconstruir esses índices após qualquer gravação.
 
-Não dividir fisicamente um tema já cadastrado sem especificar antes como preservar sua numeração. Essa extensão não integra a versão 1.
+Não dividir fisicamente um tema já cadastrado sem especificar antes como preservar sua numeração. Essa extensão não integra a versão 2.
 
 Manter JSONL sem compressão durante a edição local. Backups podem ser comprimidos. Medir volume e acesso com dados reais antes de acrescentar compressão de trabalho, banco de dados ou deduplicação.

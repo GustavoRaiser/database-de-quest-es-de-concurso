@@ -1,6 +1,6 @@
 # Base de questões de concurso
 
-Planejamento e formato inicial de uma base local de questões, organizada em arquivos pequenos por tema. Esta entrega contém documentação e exemplos; os comandos de gestão ainda serão desenvolvidos.
+Base local de questões organizada em arquivos por tema, com metadados, recursos locais e procedência de importações. Formato 2; CLI em Python 3.10 ou superior, sem dependências externas.
 
 ## Decisões do formato
 
@@ -40,3 +40,42 @@ cd database-de-quest-es-de-concurso
 | `PLANEJAMENTO.md` | Organiza a implementação local |
 
 Os quatro primeiros códigos usam base 62 e distinguem maiúsculas de minúsculas. Antes de cadastrar dados reais, verificar se o sistema de arquivos local distingue esses nomes. A restrição está detalhada na especificação.
+
+## Comandos disponíveis
+
+Executar na pasta do repositório (o argumento --base aponta para a base desejada):
+
+```sh
+python -m basequestoes --base exemplos/base validar
+python -m basequestoes --base exemplos/base consultar N32.a2.5.y.1
+python -m basequestoes --base . validar
+python -m unittest discover -s tests -v
+```
+
+Guardar recurso local, sem alterar seus bytes:
+
+```sh
+python -m basequestoes --base . guardar-recurso /caminho/figura.png --mime image/png
+```
+
+O comando retorna caminho, SHA-256 e tipo MIME. Em seguida, esses campos podem compor o registro de metadados com posição e ordem de apresentação.
+
+```sh
+python -m basequestoes --base . registrar-metadados ORGAO.CARGO.DISCIPLINA.TEMA metadados-do-lote.json
+python -m basequestoes --base . registrar-lote lote.json
+```
+
+`metadados-do-lote.json` contém uma lista de objetos. `lote.json` contém os objetos manifesto e relatorio. Veja o contrato e exemplos reais em [METADADOS.md](METADADOS.md) e [exemplos/base](exemplos/base/README.md). Metadados só podem referenciar questões já cadastradas; registros existentes não são sobrescritos.
+
+Todos esses comandos preservam os arquivos em dados/. O registro de lote documenta questões existentes; ainda não extrai PDFs, acessa APIs, acrescenta questões, converte HTML ou executa OCR.
+
+O exemplo inclui imagem SVG fictícia, conteúdo original em JSON com HTML e gabarito cujo rótulo C corresponde à segunda alternativa. Recursos são guardados sem extensão e identificados por hash e tipo MIME; nenhum HTML ou SVG é renderizado pela CLI.
+
+## Complementos da versão 2
+
+- `metadados/`: um arquivo auxiliar por tema, com referência explícita à linha da questão.
+- `recursos/`: arquivos compartilhados nomeados pelo SHA-256, sem duplicar bytes.
+- `importacoes/`: manifesto e relatório por lote, incluindo mapeamento e detecção de reenvio idêntico.
+- [METADADOS.md](METADADOS.md): contrato, migração e limites da implementação.
+
+A migração altera os manifestos; não altera as linhas das questões. O índice da raiz continua listando apenas temas.
