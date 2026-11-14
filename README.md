@@ -2,6 +2,8 @@
 
 Este repositório é organizado como uma empresa: cada pasta de trabalho representa um agente (funcionário), com responsabilidade, ferramentas, instruções e entregas próprias. A metáfora define a divisão de trabalho; uma pasta não cria nem executa uma IA automaticamente.
 
+O objetivo é permitir que uma IA em CLI/harness compare os PDFs de estudo do usuário com o histórico de questões, identificando tópicos mais/menos cobrados e mudanças na cobrança ao longo do tempo. O [registro do objetivo e revisão das próximas etapas](OBJETIVO.md) distingue o que já existe das mudanças recomendadas. Essa análise ainda não está implementada.
+
 ## Módulos
 
 | Pasta | Agente | Responsabilidade | Estado |

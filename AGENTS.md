@@ -6,7 +6,7 @@ Este repositório funciona por agentes/funcionários, representados por pastas d
 
 Antes de atuar:
 
-1. Ler README.md, ARQUITETURA.md e CONTRATOS.md na raiz.
+1. Ler README.md, OBJETIVO.md, ARQUITETURA.md e CONTRATOS.md na raiz.
 2. Identificar o módulo responsável pela tarefa.
 3. Ler AGENTS.md, README.md e o planejamento desse módulo antes de alterar seus arquivos.
 4. Consultar as especificações do Organizador quando a tarefa tocar no formato da base ou em IDs.
@@ -52,3 +52,7 @@ Ao criar um novo trabalho independente, criar uma pasta com nome descritivo e pe
 A desatualização é declarada manualmente pelo usuário. Manter suporte às situações e seus metadados; não criar uma etapa obrigatória de revisão jurídica ou atualização automática. Verificações técnicas de extração, integridade e referências continuam pertencendo às ferramentas responsáveis.
 
 O Captador só pode encaminhar um lote identificado com prova e gabarito íntegros e vinculados. Seu protocolo usa órgão.cargo.prova; o terceiro segmento não é disciplina. Registrar recepção, encaminhamento e análise como eventos distintos.
+
+## Objetivo analítico
+
+Guiar a evolução por OBJETIVO.md: permitir que IA em CLI/harness compare tópicos dos PDFs de estudo do usuário com frequência e recência de cobrança em provas. Manter linhas de questões compactas e detalhamento da prova em registro próprio, ligado por procedência. Distinguir data da aplicação de data de coleta, cadernos de ocorrências reais e ausência na amostra de ausência de cobrança. Recomendações documentadas ainda não implementadas não autorizam ampliar a tarefa atual.
