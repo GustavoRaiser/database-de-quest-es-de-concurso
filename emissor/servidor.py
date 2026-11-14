@@ -31,7 +31,7 @@ def criar_servidor(base, porta=8000, captacoes=None):
 
     def captar(comando, dados=None):
         p = subprocess.run([sys.executable, str(MODULO.parent / "captador/app.py"),
-                            "--raiz", str(captacoes), comando],
+                            "--raiz", str(captacoes), "--catalogos", str(base / 'catalogos.json'), comando],
                            input=json.dumps(dados), capture_output=True, text=True, encoding="utf-8", timeout=120)
         if p.returncode:
             raise ValueError(p.stderr.strip())
@@ -108,7 +108,7 @@ def criar_servidor(base, porta=8000, captacoes=None):
                     or self.headers.get('X-Captacao-Token') != token):
                 self.responder(403, {"erro": "Origem ou sessão inválida; recarregue a página"})
                 return
-            comandos = {'/api/captacao/criar': 'criar', '/api/captacao/anexar': 'anexar'}
+            comandos = {'/api/captacao/' + c: c for c in ('criar','anexar','identificar','encaminhar','registrar_analise')}
             if self.path not in comandos:
                 self.responder(404, {"erro": "Não encontrado"})
                 return

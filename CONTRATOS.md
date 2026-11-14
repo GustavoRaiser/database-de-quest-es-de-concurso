@@ -51,6 +51,12 @@ A desatualização é declarada pelo usuário. Não existe revisão jurídica ob
 
 ## 7. Captador → Digitalizador e interface compartilhada
 
-Contrato de captação versão 1 documentado em captador/README.md. Entrada: arquivo enviado ou selecionado em entrada/. Saída: recebidos/ID/lote.json e originais preservados por hash, um lote por prova/caderno. Gabarito e retificação apontam ao hash da prova. A correspondência de caderno é declarada pelo usuário.
+Contrato de captação versão 2 documentado em captador/README.md. Entrada: arquivo enviado ou selecionado em entrada/. Saída: recebidos/ID/lote.json e originais preservados por hash, um lote por prova/caderno. Gabarito e retificação apontam ao hash da prova. A correspondência de caderno é declarada pelo usuário.
 
 O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar material apresenta estado e pendências; as únicas gravações são no trabalho do Captador. O acervo definitivo permanece sob responsabilidade do Organizador. A extração pelo Digitalizador e o mapeamento de questões/gabaritos continuam não implementados. O lote do Captador não é o registro de importação de questões concluídas do Organizador.
+
+## 8. Registro e entrega protegida do Captador
+
+Protocolo ORGAO.CARGO.PROVA, com códigos iniciais compatíveis com o Organizador e terceiro segmento de prova exclusivo do Captador. O registro reside nos manifestos dos lotes, com banca, ano, escolaridade, áreas, localização, edição/caderno e histórico. A criação ou identificação verifica conflitos e duplicatas.
+
+Encaminhamento exige prova e gabarito íntegros, com vínculo validado novamente pela CLI. O usuário escolhe o gabarito, inclusive quando há versões preliminar/definitiva. O pacote v1 em encaminhamentos/HASH.json tem identificação, protocolo, descritores e referência relativa aos originais. Idempotência impede repetir o mesmo pacote. O futuro Digitalizador deve verificar se o pacote ainda é o encaminhamento atual do lote e conferir os hashes antes de consumir. Análise registrada manualmente exige encaminhamento e relatório e não equivale a execução automática. Sem ambos os documentos, não passa.

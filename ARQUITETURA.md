@@ -61,3 +61,5 @@ Pasta emissor/: interface no navegador e API JSON de leitura, com filtros opcion
 ## Captador e interface compartilhada
 
 Captador implementado em captador/: entrada por upload ou seleção manual de pasta, lotes por prova/edição/caderno e associação de gabaritos/retificações à prova. A área Adicionar material no Emissor consome sua CLI pública. A prévia é documental, com hashes e pendências. O Digitalizador segue planejado; nenhuma questão é extraída ou incorporada automaticamente ao Organizador. O gabarito pode chegar depois. A situação jurídica da questão é informada pelo usuário.
+
+O Captador usa protocolos órgão.cargo.prova e mantém registro filtrável e histórico. A barreira de encaminhamento exige prova e gabarito íntegros e vinculados, além da identificação. A fila registra um pacote, não a execução. Análise concluída/falha pode ser declarada manualmente pelo usuário com relatório.

@@ -19,12 +19,25 @@
 <section id="area-captacao" hidden aria-label="Captação de material">
 <h2>Adicionar material</h2><p>Reúna uma prova e seu gabarito por edição e caderno. Os originais são preservados em um lote antes da digitalização.</p>
 <form id="criar-lote"><h3>1. Identifique a prova</h3><div class="grade">
+<label>ID do órgão<input name="orgao_id" id="cap-orgao-id" list="cap-orgaos" required placeholder="Ex.: N32"><datalist id="cap-orgaos"></datalist></label>
+<label>Órgão / instituição<input name="orgao" id="cap-orgao-nome" required maxlength="1000"></label>
+<label>ID local do cargo<input name="cargo_id" id="cap-cargo-id" list="cap-cargos" required placeholder="Ex.: a2"><datalist id="cap-cargos"></datalist></label>
+<label>Cargo<input name="cargo" id="cap-cargo-nome" required maxlength="1000"></label>
+<label>Banca<input name="banca" required maxlength="200" placeholder="Ex.: FGV"></label>
+<label>Ano<input name="ano" required pattern="[0-9]{4}" maxlength="4" placeholder="2026"></label>
 <label>Prova<input name="prova" required maxlength="200" placeholder="Ex.: ENAM"></label>
 <label>Edição<input name="edicao" required maxlength="200" placeholder="Ex.: 2026.1"></label>
 <label>Caderno<input name="caderno" required maxlength="200" placeholder="Ex.: Tipo 1"></label>
-<label>Cargo<input name="cargo" maxlength="200"></label>
-<label>Fonte<input name="fonte" maxlength="1000" placeholder="Ex.: FGV"></label>
-</div><button type="submit">Criar lote</button></form>
+<label>Escolaridade<input name="escolaridade" maxlength="200" placeholder="Ex.: Superior"></label>
+<label>Área de atuação<input name="area_atuacao" maxlength="200" placeholder="Ex.: Jurídica"></label>
+<label>Área de formação<input name="area_formacao" maxlength="200" placeholder="Ex.: Direito"></label>
+<label>UF<input name="uf" maxlength="2" placeholder="Ex.: SP"></label>
+<label>Esfera<input name="esfera" maxlength="100" placeholder="Ex.: Federal"></label>
+<label>Etapa<input name="etapa" maxlength="200" placeholder="Ex.: Objetiva"></label>
+<label>Data de aplicação<input name="data_aplicacao" type="date"></label>
+<label>Edital<input name="edital" maxlength="200"></label>
+<label>Fonte<input name="fonte" maxlength="1000" placeholder="Endereço ou descrição da origem"></label>
+</div><input type="hidden" name="lote" id="identificar-legado"><p id="modo-identificacao">Códigos existentes são sugeridos. Referências novas ficam no Captador até serem cadastradas no Organizador.</p><button type="submit" id="salvar-protocolo">Registrar prova</button><button type="button" id="cancelar-identificacao" class="secundario" hidden>Cancelar identificação</button></form>
 <form id="anexar-material"><h3>2. Adicione os documentos</h3>
 <label>Lote de destino<select id="lote-destino" name="lote" required></select></label>
 <div class="grade"><label>Tipo de documento<select id="tipo-documento" name="tipo"><option value="prova">Prova — questões</option><option value="gabarito">Gabarito</option><option value="retificacao">Retificação</option><option value="complemento">Complemento</option></select></label>
@@ -37,6 +50,9 @@
 <button type="submit">Receber documento</button></form>
 <div class="acoes"><button type="button" class="secundario" id="verificar-entrada">Verificar pasta e atualizar lotes</button></div>
 <p>Para entrada por pasta, coloque arquivos em <code>captador/trabalho/entrada/</code> (ou na pasta configurada ao iniciar o servidor). A leitura não move nem apaga os originais.</p>
-<p id="aviso-captacao" role="status" aria-live="polite"></p><div id="lista-lotes"></div>
+<p id="aviso-captacao" role="status" aria-live="polite"></p>
+<h3>Registro de provas</h3><p>Recepção, encaminhamento e análise são etapas distintas. Encaminhar exige prova e gabarito; não inicia a extração automaticamente.</p>
+<form id="filtros-protocolo"><div class="grade" id="campos-filtros-protocolo"></div><label>Palavra-chave<input id="busca-protocolo" placeholder="Prova, protocolo, cargo, edital…"></label><button type="reset" class="secundario">Limpar filtros do registro</button></form>
+<p id="total-protocolos" aria-live="polite"></p><div id="lista-lotes"></div>
 </section>
 </main><script src="/app.js"></script><script src="/captacao.js"></script></body></html>

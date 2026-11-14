@@ -50,3 +50,5 @@ Ao criar um novo trabalho independente, criar uma pasta com nome descritivo e pe
 ## Situação e revisão
 
 A desatualização é declarada manualmente pelo usuário. Manter suporte às situações e seus metadados; não criar uma etapa obrigatória de revisão jurídica ou atualização automática. Verificações técnicas de extração, integridade e referências continuam pertencendo às ferramentas responsáveis.
+
+O Captador só pode encaminhar um lote identificado com prova e gabarito íntegros e vinculados. Seu protocolo usa órgão.cargo.prova; o terceiro segmento não é disciplina. Registrar recepção, encaminhamento e análise como eventos distintos.

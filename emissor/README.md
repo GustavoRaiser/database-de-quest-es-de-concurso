@@ -59,3 +59,9 @@ python -m unittest discover -s emissor/tests -v
 ## Adicionar material
 
 A interface agora inclui a área Adicionar material. Ela permite criar lotes, enviar arquivos, verificar a pasta de entrada e anexar gabaritos/retificações. O servidor delega essas ações ao Captador. Configure o armazenamento com --captacoes CAMINHO; padrão captador/trabalho/. Veja o [contrato do Captador](../captador/README.md). A captação ainda não extrai questões; a prévia mostra os documentos recebidos e suas pendências.
+
+## Registro de provas e encaminhamento
+
+Adicionar material agora exige os códigos e nomes de órgão/cargo, banca e ano, além de prova/edição/caderno. Campos opcionais permitem escolaridade, áreas, UF, esfera, etapa, edital e data. A lista de protocolos possui filtros próprios e histórico por prova. A interface sugere códigos conhecidos; novos códigos são referências do Captador, sem cadastrar categorias no Organizador.
+
+O botão de encaminhar só é habilitado com prova e gabarito íntegros e identificação completa. O servidor e a CLI repetem a validação. O usuário escolhe o gabarito; a ação registra o pacote na fila e ainda não extrai PDFs. Lotes antigos têm ação de identificação. Há registro manual de resultado de análise, com relatório explícito do usuário.

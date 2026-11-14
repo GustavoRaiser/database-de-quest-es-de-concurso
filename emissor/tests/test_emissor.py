@@ -111,7 +111,7 @@ class EmissorTest(unittest.TestCase):
     def test_captacao_integrada_e_protecao(self):
         with urlopen(self.url+'/api/captacao') as r:
             estado=json.load(r)
-        dados=json.dumps({'prova':'ENAM teste','edicao':'2026.1','caderno':'Tipo 1'}).encode()
+        dados=json.dumps({'prova':'ENAM teste','edicao':'2026.1','caderno':'Tipo 1','orgao_id':'N32','cargo_id':'a2','orgao':'Órgão fictício','cargo':'Cargo fictício','banca':'FGV','ano':'2026'}).encode()
         url=self.url+'/api/captacao/criar'
         with self.assertRaises(HTTPError) as erro:
             urlopen(Request(url,data=dados,headers={'Content-Type':'application/json'}))
@@ -123,7 +123,11 @@ class EmissorTest(unittest.TestCase):
         dados=json.dumps({'lote':lote['id'],'nome':'prova.pdf','tipo':'prova',
                           'conteudo_base64':base64.b64encode(b'%PDF-1.4\nfixture').decode()}).encode()
         with urlopen(Request(self.url+'/api/captacao/anexar',data=dados,headers=headers)) as r:
-            self.assertEqual(json.load(r)['estado'],'pronto_para_digitalizador')
+            self.assertEqual(json.load(r)['estado'],'aguardando_gabarito')
+        args=json.dumps({'lote':lote['id']}).encode()
+        with self.assertRaises(HTTPError) as erro:
+            urlopen(Request(self.url+'/api/captacao/encaminhar',data=args,headers=headers))
+        self.assertEqual(erro.exception.code,400)
         self.assertEqual(self.get()['total'],5)
         with urlopen(self.url+'/captacao.js') as r:
             self.assertEqual(r.status,200)
