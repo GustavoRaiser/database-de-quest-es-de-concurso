@@ -7,7 +7,7 @@ import tempfile
 import threading
 import unittest
 from urllib.error import HTTPError
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("servidor", ROOT / "emissor/servidor.py")
@@ -34,7 +34,7 @@ class EmissorTest(unittest.TestCase):
         q.parent.mkdir(parents=True)
         q.write_text('[0,"Outra questão",["A","B"]]\n')
         cls.antes = cls.hashes()
-        cls.server = servidor.criar_servidor(cls.base, 0)
+        cls.server = servidor.criar_servidor(cls.base, 0, Path(cls.temp.name)/'captacoes')
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         cls.url = f'http://127.0.0.1:{cls.server.server_port}'
@@ -107,6 +107,26 @@ class EmissorTest(unittest.TestCase):
     def test_base_vazia(self):
         d = servidor.consultar(ROOT/'organizador', 'emitir')
         self.assertEqual((d['total'], d['itens']), (0, []))
+
+    def test_captacao_integrada_e_protecao(self):
+        with urlopen(self.url+'/api/captacao') as r:
+            estado=json.load(r)
+        dados=json.dumps({'prova':'ENAM teste','edicao':'2026.1','caderno':'Tipo 1'}).encode()
+        url=self.url+'/api/captacao/criar'
+        with self.assertRaises(HTTPError) as erro:
+            urlopen(Request(url,data=dados,headers={'Content-Type':'application/json'}))
+        self.assertEqual(erro.exception.code,403)
+        headers={'Content-Type':'application/json','Origin':self.url,'X-Captacao-Token':estado['token_captacao']}
+        with urlopen(Request(url,data=dados,headers=headers)) as r:
+            lote=json.load(r)
+        import base64
+        dados=json.dumps({'lote':lote['id'],'nome':'prova.pdf','tipo':'prova',
+                          'conteudo_base64':base64.b64encode(b'%PDF-1.4\nfixture').decode()}).encode()
+        with urlopen(Request(self.url+'/api/captacao/anexar',data=dados,headers=headers)) as r:
+            self.assertEqual(json.load(r)['estado'],'pronto_para_digitalizador')
+        self.assertEqual(self.get()['total'],5)
+        with urlopen(self.url+'/captacao.js') as r:
+            self.assertEqual(r.status,200)
 
 
 if __name__ == '__main__':

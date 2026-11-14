@@ -16,7 +16,8 @@ As instruções deste arquivo se aplicam ao repositório inteiro. AGENTS.md loca
 ## Separação de responsabilidades
 
 - organizador/: estrutura, armazenamento definitivo, metadados, recursos, procedência, validação e consulta.
-- emissor/: apresentação, filtros e API de leitura; não modifica o acervo.
+- emissor/: interface compartilhada de consulta e captação; delega a recepção ao Captador e não modifica o acervo definitivo.
+- captador/: recepção de originais, lotes, vínculos de gabaritos e procedência; não extrai questões.
 - digitalizador/: extração de conteúdo de fontes, reconstrução de layout, OCR, preparação de texto/HTML e relatórios de extração.
 - Raiz: apenas navegação, arquitetura, contratos e configurações realmente globais. Não colocar ferramentas de um agente na raiz.
 - Código, testes, dependências, exemplos e instruções específicos pertencem à pasta do respectivo agente.

@@ -6,6 +6,7 @@ Este repositório é organizado como uma empresa: cada pasta de trabalho represe
 
 | Pasta | Agente | Responsabilidade | Estado |
 |---|---|---|---|
+| [captador/](captador/README.md) | Captador | Recebe originais, organiza lotes e associa gabaritos | Implementado com interface no Emissor |
 | [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI e testes implementados; algumas funções de escrita ainda planejadas |
 | [emissor/](emissor/README.md) | Emissor | Visualização com filtros e API JSON para ferramentas próprias | Implementado |
 | [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | Estrutura e instruções preparadas; processamento ainda não implementado |
@@ -34,6 +35,12 @@ emissor/
     PLANEJAMENTO.md
     servidor.py
     web/
+    tests/
+captador/
+    AGENTS.md
+    README.md
+    PLANEJAMENTO.md
+    app.py
     tests/
 digitalizador/
     AGENTS.md
@@ -77,3 +84,7 @@ python emissor/servidor.py --base organizador/exemplos/base
 ```
 
 Abra http://127.0.0.1:8000. Para consultar o acervo real, use `--base organizador` (ainda vazio). Todos os filtros são opcionais; sem filtros, toda a base é consultada, com paginação. Veja [Emissor](emissor/README.md) para uso da API em uma ferramenta própria.
+
+## Receber provas e gabaritos
+
+No mesmo servidor local, abra **Adicionar material**. Crie um lote por prova/edição/caderno, adicione a prova e depois seus gabaritos e retificações. Também é possível selecionar arquivos colocados em captador/trabalho/entrada/. Veja o [Captador](captador/README.md). A prévia atual mostra documentos e pendências; a extração de questões pelo Digitalizador ainda será implementada.

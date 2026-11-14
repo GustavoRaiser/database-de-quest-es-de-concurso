@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 .base.lock
 *.tmp
+/captador/trabalho/

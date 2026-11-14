@@ -48,3 +48,9 @@ A CLI pública do Organizador oferece catalogos e emitir. emitir aceita --orgao,
 O Emissor consome essa interface por subprocesso sem shell e publica /api/catalogos e /api/questoes, documentados em emissor/README.md. Recursos seguem o contrato local de SHA-256. Operações são de leitura; não acrescentam questões nem alteram situações. Ferramentas próprias podem consumir a CLI, a API local ou o formato documentado diretamente.
 
 A desatualização é declarada pelo usuário. Não existe revisão jurídica obrigatória nem monitoramento automático de atualidade neste fluxo.
+
+## 7. Captador → Digitalizador e interface compartilhada
+
+Contrato de captação versão 1 documentado em captador/README.md. Entrada: arquivo enviado ou selecionado em entrada/. Saída: recebidos/ID/lote.json e originais preservados por hash, um lote por prova/caderno. Gabarito e retificação apontam ao hash da prova. A correspondência de caderno é declarada pelo usuário.
+
+O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar material apresenta estado e pendências; as únicas gravações são no trabalho do Captador. O acervo definitivo permanece sob responsabilidade do Organizador. A extração pelo Digitalizador e o mapeamento de questões/gabaritos continuam não implementados. O lote do Captador não é o registro de importação de questões concluídas do Organizador.

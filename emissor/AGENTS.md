@@ -7,3 +7,7 @@ Manter servidor, interface, testes e instruções nesta pasta. Usar a CLI públi
 Sem filtros significa toda a base, com paginação; não limitar silenciosamente ao primeiro tema ou órgão. Filtros usam chaves completas sensíveis a maiúsculas/minúsculas. Preservar identidade por linha, textos de apoio, ordem e posição de recursos. Atualização jurídica e revisão de conteúdo não pertencem a este módulo; a situação é exibida como cadastrada.
 
 Verificação: executar `python -m unittest discover -s emissor/tests -v` na raiz. Mudanças no contrato público também precisam manter os testes do Organizador passando.
+
+## Interface de captação
+
+A área Adicionar material delega operações ao Captador por sua CLI pública. Pode gravar no trabalho do Captador, nunca no acervo definitivo. Recepção e associação de documentos pertencem ao Captador; a interface mostra seu estado sem simular extração. POST exige a proteção de origem e sessão implementada no servidor.

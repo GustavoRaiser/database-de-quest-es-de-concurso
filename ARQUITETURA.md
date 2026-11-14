@@ -25,6 +25,8 @@ Entrega candidatos e relatórios; não escreve no acervo definitivo. Sua estrutu
 ```text
 Fonte (PDF / imagem / conteúdo estruturado)
                   ↓
+Captador: recepção, originais e associação de documentos
+                  ↓
 Digitalizador: extração + procedência + pendências
                   ↓
 Entrega intermediária, ainda sem ID local definitivo
@@ -55,3 +57,7 @@ Uma função deve ter um responsável principal. Extração pertence ao Digitali
 ## Emissor
 
 Pasta emissor/: interface no navegador e API JSON de leitura, com filtros opcionais de órgão, cargo, disciplina e tema. Sem filtros, toda a base participa da consulta paginada. Inclui metadados, textos de apoio e recursos; mostra a situação como cadastrada. Usa a CLI pública do Organizador, sem importar seu código interno. Já implementado para execução local, sem hospedagem automática pelo GitHub.
+
+## Captador e interface compartilhada
+
+Captador implementado em captador/: entrada por upload ou seleção manual de pasta, lotes por prova/edição/caderno e associação de gabaritos/retificações à prova. A área Adicionar material no Emissor consome sua CLI pública. A prévia é documental, com hashes e pendências. O Digitalizador segue planejado; nenhuma questão é extraída ou incorporada automaticamente ao Organizador. O gabarito pode chegar depois. A situação jurídica da questão é informada pelo usuário.

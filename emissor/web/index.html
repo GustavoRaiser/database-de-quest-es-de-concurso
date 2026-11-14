@@ -4,6 +4,8 @@
 <title>Emissor · Questões</title><link rel="stylesheet" href="/style.css">
 <body><main>
 <header><p class="marca">ACERVO DE QUESTÕES</p><h1>Emissor</h1><p>Explore toda a base ou combine filtros para encontrar suas questões.</p></header>
+<div class="acoes"><button type="button" id="aba-consulta">Consultar questões</button><button type="button" id="aba-captacao" class="secundario">Adicionar material</button></div>
+<div id="area-consulta">
 <form id="filtros"><div class="grade">
 <label>Órgão<select id="orgao" name="orgao"><option value="">Todos</option></select></label>
 <label>Cargo<select id="cargo" name="cargo"><option value="">Todos</option></select></label>
@@ -13,4 +15,28 @@
 <p id="aviso" role="status" aria-live="polite">Carregando questões…</p>
 <section id="questoes" aria-label="Questões"></section>
 <nav aria-label="Paginação"><button id="anterior" class="secundario">Anterior</button><span id="pagina"></span><button id="proxima" class="secundario">Próxima</button></nav>
-</main><script src="/app.js"></script></body></html>
+</div>
+<section id="area-captacao" hidden aria-label="Captação de material">
+<h2>Adicionar material</h2><p>Reúna uma prova e seu gabarito por edição e caderno. Os originais são preservados em um lote antes da digitalização.</p>
+<form id="criar-lote"><h3>1. Identifique a prova</h3><div class="grade">
+<label>Prova<input name="prova" required maxlength="200" placeholder="Ex.: ENAM"></label>
+<label>Edição<input name="edicao" required maxlength="200" placeholder="Ex.: 2026.1"></label>
+<label>Caderno<input name="caderno" required maxlength="200" placeholder="Ex.: Tipo 1"></label>
+<label>Cargo<input name="cargo" maxlength="200"></label>
+<label>Fonte<input name="fonte" maxlength="1000" placeholder="Ex.: FGV"></label>
+</div><button type="submit">Criar lote</button></form>
+<form id="anexar-material"><h3>2. Adicione os documentos</h3>
+<label>Lote de destino<select id="lote-destino" name="lote" required></select></label>
+<div class="grade"><label>Tipo de documento<select id="tipo-documento" name="tipo"><option value="prova">Prova — questões</option><option value="gabarito">Gabarito</option><option value="retificacao">Retificação</option><option value="complemento">Complemento</option></select></label>
+<label id="campo-situacao" hidden>Situação do gabarito<select name="situacao_gabarito" id="situacao-gabarito"><option value="preliminar">Preliminar</option><option value="definitivo">Definitivo</option></select></label>
+<label>Origem do arquivo<select id="canal-material"><option value="upload">Enviar arquivo</option><option value="pasta">Arquivo da pasta de entrada</option></select></label>
+<label id="campo-upload">Arquivo (até 15 MiB)<input id="arquivo-material" type="file" accept=".pdf,.png,.jpg,.jpeg,.gif,.json,.jsonl,.html,.txt"></label>
+<label id="campo-pasta" hidden>Arquivo disponível<select id="arquivo-pasta"></select></label>
+<label>URL de origem (opcional)<input name="url_origem" maxlength="2000" placeholder="Registra a origem; não baixa o link"></label></div>
+<p>Adicione primeiro a prova. O gabarito e as retificações serão vinculados à prova do lote selecionado. Confirme que edição e caderno correspondem.</p>
+<button type="submit">Receber documento</button></form>
+<div class="acoes"><button type="button" class="secundario" id="verificar-entrada">Verificar pasta e atualizar lotes</button></div>
+<p>Para entrada por pasta, coloque arquivos em <code>captador/trabalho/entrada/</code> (ou na pasta configurada ao iniciar o servidor). A leitura não move nem apaga os originais.</p>
+<p id="aviso-captacao" role="status" aria-live="polite"></p><div id="lista-lotes"></div>
+</section>
+</main><script src="/app.js"></script><script src="/captacao.js"></script></body></html>

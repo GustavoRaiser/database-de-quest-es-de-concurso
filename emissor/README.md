@@ -34,7 +34,7 @@ A ferramenta exibe enunciado, alternativas em quantidade livre, situação regis
 - Os valores dos filtros são chaves completas: `orgao=N32`, `cargo=N32.a2`, `disciplina=N32.a2.5`, `tema=N32.a2.5.y`.
 - Cada item contém `id`, `questao` (array original), `metadados` (objeto ou null) e `classificacao` (nomes e IDs).
 - `GET /recursos/XX/HASH`: recurso local com integridade verificada; formatos ativos são baixados como arquivo.
-- Erros de parâmetros retornam HTTP 400 com `erro`; caminhos desconhecidos retornam 404. Não há endpoints de escrita nem CORS aberto.
+- Erros de parâmetros retornam HTTP 400 com `erro`; caminhos desconhecidos retornam 404. Não há endpoints de escrita no acervo definitivo nem CORS aberto. A recepção de documentos usa os endpoints específicos de captação.
 
 Exemplo: http://127.0.0.1:8000/api/questoes?orgao=N32&pagina=1&por_pagina=20
 
@@ -55,3 +55,7 @@ Na raiz:
 ```sh
 python -m unittest discover -s emissor/tests -v
 ```
+
+## Adicionar material
+
+A interface agora inclui a área Adicionar material. Ela permite criar lotes, enviar arquivos, verificar a pasta de entrada e anexar gabaritos/retificações. O servidor delega essas ações ao Captador. Configure o armazenamento com --captacoes CAMINHO; padrão captador/trabalho/. Veja o [contrato do Captador](../captador/README.md). A captação ainda não extrai questões; a prévia mostra os documentos recebidos e suas pendências.
