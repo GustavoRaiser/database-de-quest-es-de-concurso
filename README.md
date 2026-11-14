@@ -1,81 +1,61 @@
-# Base de questões de concurso
+# Sistema de questões de concurso
 
-Base local de questões organizada em arquivos por tema, com metadados, recursos locais e procedência de importações. Formato 3; CLI em Python 3.10 ou superior, sem dependências externas.
+Este repositório é organizado como uma empresa: cada pasta de trabalho representa um agente (funcionário), com responsabilidade, ferramentas, instruções e entregas próprias. A metáfora define a divisão de trabalho; uma pasta não cria nem executa uma IA automaticamente.
 
-## Decisões do formato
+## Módulos
 
-- Hierarquia: órgão → cargo → disciplina → tema.
-- Pastas por órgão, cargo e disciplina; um arquivo JSONL por tema.
-- Identificador: `orgao.cargo.disciplina.tema.linha`.
-- A questão da linha 1 é a questão 1, sem conversão ou deslocamento.
-- Cada linha contém `[situacao,enunciado,assertivas]`.
-- Situação: `0` atualizada; `1` desatualizada; `2` anulada.
-- Assertivas em quantidade livre, preservando a ordem.
-- Inclusões ao final; nenhuma exclusão ou reordenação.
-- A situação pode ser alterada, preservando a linha e seu conteúdo textual.
-- O índice central lista temas e arquivos, sem enumerar questões.
+| Pasta | Agente | Responsabilidade | Estado |
+|---|---|---|---|
+| [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI e testes implementados; algumas funções de escrita ainda planejadas |
+| [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | Estrutura e instruções preparadas; processamento ainda não implementado |
 
-## Começar localmente
+## Estrutura
+
+```text
+AGENTS.md                # orientação para todas as IAs
+ARQUITETURA.md           # mapa de responsabilidades
+CONTRATOS.md             # regras de entrega entre agentes
+organizador/
+    AGENTS.md
+    README.md
+    ESPECIFICACAO.md
+    METADADOS.md
+    PLANEJAMENTO.md
+    basequestoes/        # ferramentas do Organizador
+    tests/               # testes do Organizador
+    manifesto.json      # início da base real, ainda vazia
+    catalogos.json
+    indice.json
+    exemplos/base/      # base fictícia independente
+digitalizador/
+    AGENTS.md
+    README.md
+    PLANEJAMENTO.md
+```
+
+Dentro de cada base, a estrutura continua sendo:
+
+```text
+dados/ORGAO/CARGO/DISCIPLINA/TEMA.jsonl
+dados/ORGAO/CARGO/DISCIPLINA/TEMA_md.json
+```
+
+Órgão, cargo e disciplina são pastas. Tema é o nome dos dois arquivos, não uma pasta adicional. A questão é identificada pela linha decimal no arquivo de questões. Mover o módulo inteiro não altera os caminhos relativos internos nem os IDs.
+
+## Começar
 
 ```sh
 git clone https://github.com/GustavoRaiser/database-de-quest-es-de-concurso.git
-cd database-de-quest-es-de-concurso
-```
-
-1. Ler a [especificação](ESPECIFICACAO.md).
-2. Examinar a base fictícia em [exemplos/base](exemplos/base/README.md).
-3. Seguir o [plano de desenvolvimento](PLANEJAMENTO.md).
-
-`manifesto.json`, `catalogos.json` e `indice.json` na raiz são o ponto de partida da base real, ainda vazia. A pasta `dados/` será criada no cadastro do primeiro tema. O exemplo constitui uma base independente; seus registros não devem ser importados automaticamente para a base real.
-
-## Arquivos
-
-| Arquivo | Papel |
-|---|---|
-| `manifesto.json` | Declara como interpretar a base |
-| `catalogos.json` | Traduz os quatro primeiros componentes para nomes |
-| `indice.json` | Localiza os arquivos dos temas |
-| `dados/ORGAO/CARGO/DISCIPLINA/TEMA.jsonl` | Guarda uma questão por linha |
-| `ESPECIFICACAO.md` | Define o contrato para ferramentas futuras |
-| `PLANEJAMENTO.md` | Organiza a implementação local |
-
-Os quatro primeiros códigos usam base 62 e distinguem maiúsculas de minúsculas. Antes de cadastrar dados reais, verificar se o sistema de arquivos local distingue esses nomes. A restrição está detalhada na especificação.
-
-## Comandos disponíveis
-
-Executar na pasta do repositório (o argumento --base aponta para a base desejada):
-
-```sh
+cd database-de-quest-es-de-concurso/organizador
 python -m basequestoes --base exemplos/base validar
 python -m basequestoes --base exemplos/base consultar N32.a2.5.y.1
-python -m basequestoes --base . validar
 python -m unittest discover -s tests -v
 ```
 
-Guardar recurso local, sem alterar seus bytes:
+Python 3.10 ou superior; o Organizador usa apenas a biblioteca padrão.
 
-```sh
-python -m basequestoes --base . guardar-recurso /caminho/figura.png --mime image/png
-```
+Para iniciar qualquer trabalho, ler [AGENTS.md](AGENTS.md), [ARQUITETURA.md](ARQUITETURA.md), [CONTRATOS.md](CONTRATOS.md) e as instruções do módulo escolhido. Ferramentas, testes e documentação de uma função devem ficar no módulo responsável, sem misturar extração com armazenamento definitivo.
 
-O comando retorna caminho, SHA-256 e tipo MIME. Em seguida, esses campos podem compor o registro de metadados com posição e ordem de apresentação.
+## Mudança de localização
 
-```sh
-python -m basequestoes --base . registrar-metadados ORGAO.CARGO.DISCIPLINA.TEMA metadados-do-lote.json
-python -m basequestoes --base . registrar-lote lote.json
-```
-
-`metadados-do-lote.json` contém um objeto com números de questões como chaves (por exemplo, `{"3": {"origens": [...]}}`). `lote.json` contém os objetos manifesto e relatorio. Veja o contrato e exemplos reais em [METADADOS.md](METADADOS.md) e [exemplos/base](exemplos/base/README.md). Metadados só podem referenciar questões já cadastradas; registros existentes não são sobrescritos.
-
-Todos esses comandos preservam os arquivos em dados/. O registro de lote documenta questões existentes; ainda não extrai PDFs, acessa APIs, acrescenta questões, converte HTML ou executa OCR.
-
-O exemplo inclui imagem SVG fictícia, conteúdo original em JSON com HTML e gabarito cujo rótulo C corresponde à segunda alternativa. Recursos são guardados sem extensão e identificados por hash e tipo MIME; nenhum HTML ou SVG é renderizado pela CLI.
-
-## Complementos da versão 3
-
-- `dados/.../TEMA_md.json`: arquivo auxiliar ao lado de `TEMA.jsonl`, com números de questões como chaves.
-- `recursos/`: arquivos compartilhados nomeados pelo SHA-256, sem duplicar bytes.
-- `importacoes/`: manifesto e relatório por lote, incluindo mapeamento e detecção de reenvio idêntico.
-- [METADADOS.md](METADADOS.md): contrato, migração e limites da implementação.
-
-A migração altera os manifestos; não altera as linhas das questões. O índice da raiz continua listando apenas temas.
+O conteúdo que antes ficava na raiz agora está em organizador/. Após atualizar seu clone, execute os comandos dentro dessa pasta. O formato dos dados continua na versão 3: esta reorganização não altera o conteúdo dos manifestos, registros, metadados ou recursos. O Digitalizador permanece sem código de processamento.
