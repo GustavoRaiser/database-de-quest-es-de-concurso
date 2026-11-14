@@ -2,7 +2,7 @@
 
 ## Estado inicial
 
-Formato 2, exemplos e CLI em Python implementados. Já existem leitura, validação, consulta com metadados, armazenamento de recursos por hash, registro de metadados e registro de lotes de questões existentes. A base principal continua vazia.
+Formato 3, exemplos e CLI em Python implementados. Já existem leitura, validação, consulta com metadados, armazenamento de recursos por hash, registro de metadados e registro de lotes de questões existentes. A base principal continua vazia.
 
 Ainda não há extrator de PDF, adaptador da Quest API, conversor/sanitizador de HTML, cadastro de categorias, inclusão de questões ou atualização de situação por comando. O registro de lote não faz essas importações.
 
@@ -12,7 +12,7 @@ Ainda não há extrator de PDF, adaptador da Quest API, conversor/sanitizador de
 - Verificar a distinção entre nomes maiúsculos e minúsculos no volume local.
 - Ler ESPECIFICACAO.md e usar exemplos/base como amostra independente.
 - Escolher a linguagem e a interface inicial. A CLI atual usa Python 3.10 ou superior, sem dependências externas.
-- Manter a versão 2 e as posições dos campos alinhadas ao manifesto.
+- Manter a versão 3 e as posições dos campos alinhadas ao manifesto.
 
 Resultado: ambiente capaz de ler os arquivos de exemplo sem mudar sua estrutura.
 

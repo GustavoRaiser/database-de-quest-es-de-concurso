@@ -15,7 +15,7 @@ O arquivo tem quatro questões em quatro linhas físicas. A quebra escapada do �
 
 ## Complementos fictícios da questão 1
 
-- Metadados em metadados/N32/a2/5/y.jsonl.
+- Metadados em dados/N32/a2/5/y_md.json, na chave "1". O arquivo fica ao lado de y.jsonl e não repete o campo questao.
 - Gabarito definitivo na segunda alternativa, com rótulo original C.
 - Um SVG ilustrativo e o conteúdo original em JSON, preservado com HTML.
 - Lote exemplo-ficticio relacionando o número original 41 à questão local 1.

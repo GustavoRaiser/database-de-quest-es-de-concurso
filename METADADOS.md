@@ -1,4 +1,4 @@
-# Metadados, recursos e procedência — formato 2
+# Metadados, recursos e procedência — formato 3
 
 O registro principal continua `[situacao,enunciado,assertivas]`. Nenhuma questão muda de posição ou recebe ID dentro da linha. O número decimal da linha continua identificando a questão.
 
@@ -9,7 +9,7 @@ manifesto.json
 catalogos.json
 indice.json
 dados/ORGAO/CARGO/DISCIPLINA/TEMA.jsonl
-metadados/ORGAO/CARGO/DISCIPLINA/TEMA.jsonl
+dados/ORGAO/CARGO/DISCIPLINA/TEMA_md.json
 recursos/ab/ab...hash-sha256-completo...
 importacoes/identificador-do-lote/manifesto.json
 importacoes/identificador-do-lote/relatorio.json
@@ -19,13 +19,15 @@ Não existe índice central de questões. O arquivo de metadados é opcional por
 
 ## Registro de metadados
 
-Um objeto JSON por linha. O campo `questao` é o número decimal da linha no arquivo principal daquele tema, começando em 1. A posição do registro de metadados não tem significado. Não pode haver dois registros para a mesma questão no mesmo arquivo.
+Um objeto JSON por arquivo, com números decimais das questões como chaves: `{"3": {"origens": [...]}, "80": {"origens": [...]}}`. Cada chave corresponde à linha do arquivo TEMA.jsonl, começando em 1, sem zeros à esquerda. Não há campo `questao` nos valores nem correspondência entre linhas dos dois arquivos. Não há posições vazias para questões sem complementos. O arquivo pode ser formatado em várias linhas. Chaves duplicadas são recusadas.
+
+Ao reconstruir uma questão, procurar a chave correspondente em TEMA_md.json. Se o arquivo ou a chave não existir, retornar metadados nulos. A ausência de metadados não comprova que uma importação foi completa.
 
 Campos reconhecidos:
 
 | Campo | Regra |
 |---|---|
-| `questao` | Inteiro positivo; a questão referida deve existir |
+| Chave do objeto | Número decimal positivo em string; a questão referida deve existir |
 | `origens` | Lista não vazia de origens |
 | `gabarito` | Opcional; ausência significa informação não registrada |
 | `textos_apoio` | Lista opcional de strings em texto simples, na ordem original |
@@ -113,12 +115,19 @@ A impressão digital combina fonte, hashes dos documentos e números originais, 
 
 O lote é gravado em pasta temporária e publicado por renomeação. Metadados são validados em conjunto antes de substituir seu arquivo. As operações usam exclusão por `.base.lock`. Após uma interrupção, conferir o estado antes de remover um bloqueio restante. Nenhum dos comandos escreve em `dados/`.
 
-## Migrar do formato 1
+## Migração dos formatos anteriores
 
-1. Fazer uma cópia de segurança.
-2. Alterar `versao` do manifesto para 2.
-3. Acrescentar `versao_metadados: 1`, `diretorio_metadados: "metadados"`, `diretorio_recursos: "recursos"` e `diretorio_importacoes: "importacoes"`.
-4. Não reescrever, mover ou ordenar arquivos de questões; catálogo e índice também permanecem iguais.
-5. Executar o validador.
+A versão 3 usa `versao_metadados: 2`. A mudança é incompatível com o armazenamento auxiliar da versão 2, embora as linhas das questões permaneçam intactas. A CLI exige o manifesto v3.
 
-Pastas auxiliares vazias podem não existir. Questões antigas continuam válidas sem metadados. A CLI atual exige o manifesto v2; ferramentas antigas precisam ser atualizadas para compreender os complementos.
+Para migrar uma base v2:
+
+1. Fazer backup e suspender gravações durante a conversão.
+2. Para cada arquivo metadados/ORGAO/CARGO/DISCIPLINA/TEMA.jsonl, converter os objetos em um mapa. Retirar o campo questao de cada registro e usar seu valor decimal como chave em string. Recusar registros duplicados antes de converter.
+3. Salvar o mapa em dados/ORGAO/CARGO/DISCIPLINA/TEMA_md.json. Não sobrescrever um arquivo já existente sem comparar os conteúdos.
+4. No manifesto, definir versao: 3 e versao_metadados: 2; remover diretorio_metadados; acrescentar caminho_metadados: "dados/{orgao}/{cargo}/{disciplina}/{tema}_md.json". Preservar os diretórios recursos e importacoes.
+5. Conferir a equivalência dos registros convertidos e retirar os arquivos auxiliares antigos da base ativa, preservando o backup. O validador recusa arquivos JSONL restantes na antiga pasta metadados/.
+6. Validar a base e comparar os hashes dos arquivos de questões antes/depois. Eles não devem mudar. Catálogo, índice, recursos e registros de lotes permanecem iguais.
+
+Para uma base v1 sem complementos, atualizar o manifesto para a versão 3, acrescentar versao_metadados: 2, caminho_metadados e os diretórios recursos/importacoes conforme o manifesto de exemplo. Não alterar arquivos de questões.
+
+Os manifestos e o exemplo deste repositório já estão migrados. Não há comando automático de migração de bases externas nesta entrega.

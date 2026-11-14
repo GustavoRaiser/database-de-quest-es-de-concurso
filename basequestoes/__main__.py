@@ -8,7 +8,7 @@ from .core import Base, Erro, ler_json
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Questões, procedência e recursos locais (v2)")
+    parser = argparse.ArgumentParser(description="Questões, procedência e recursos locais (v3)")
     parser.add_argument("--base", default=".", help="pasta que contém manifesto.json")
     sub = parser.add_subparsers(dest="comando", required=True)
     sub.add_parser("validar")
@@ -19,7 +19,7 @@ def main():
     recurso.add_argument("--mime", required=True)
     metadados = sub.add_parser("registrar-metadados")
     metadados.add_argument("tema")
-    metadados.add_argument("arquivo", help="JSON contendo lista de metadados")
+    metadados.add_argument("arquivo", help="objeto JSON com números de questões como chaves")
     lote = sub.add_parser("registrar-lote")
     lote.add_argument("arquivo", help="JSON com manifesto e relatorio de questões já cadastradas")
     args = parser.parse_args()

@@ -1,4 +1,4 @@
-"""Formato v2; apenas biblioteca padrão, sem rede e sem renderizar HTML."""
+"""Formato v3; apenas biblioteca padrão, sem rede e sem renderizar HTML."""
 
 import hashlib
 import json
@@ -104,6 +104,10 @@ def caminho_tema(tema, diretorio):
     return f"{diretorio}/{a}/{b}/{c}/{d}.jsonl"
 
 
+def caminho_metadados(tema):
+    return caminho_tema(tema, "dados").removesuffix(".jsonl") + "_md.json"
+
+
 def registro(valor):
     exigir(isinstance(valor, list) and len(valor) == 3, "esperado [situacao,enunciado,assertivas]")
     exigir(type(valor[0]) is int and valor[0] in (0, 1, 2), "situação inválida")
@@ -117,11 +121,12 @@ class Base:
         self.raiz = Path(raiz).resolve()
         self.manifesto = ler_json(self.raiz / "manifesto.json")
         esperado = {
-            "formato": "base-questoes", "versao": 2, "codificacao": "UTF-8",
+            "formato": "base-questoes", "versao": 3, "codificacao": "UTF-8",
             "registros": "jsonl", "campos": ["situacao", "enunciado", "assertivas"],
             "catalogos": "catalogos.json", "indice": "indice.json", "diretorio_dados": "dados",
-            "diretorio_metadados": "metadados", "diretorio_recursos": "recursos",
-            "diretorio_importacoes": "importacoes", "versao_metadados": 1,
+            "caminho_metadados": "dados/{orgao}/{cargo}/{disciplina}/{tema}_md.json",
+            "diretorio_recursos": "recursos",
+            "diretorio_importacoes": "importacoes", "versao_metadados": 2,
         }
         exigir(isinstance(self.manifesto, dict), "manifesto deve ser objeto")
         for chave, valor in esperado.items():
@@ -235,24 +240,34 @@ class Base:
         exigir(isinstance(item.get("textos_apoio", []), list)
                and all(isinstance(t, str) for t in item.get("textos_apoio", [])), "textos de apoio inválidos")
 
+    def validar_mapa_metadados(self, tema, mapa):
+        tema_valido(tema)
+        exigir(isinstance(mapa, dict), "metadados devem ser objeto indexado pelo número da questão")
+        for numero, item in mapa.items():
+            exigir(isinstance(numero, str) and re.fullmatch(r"[1-9][0-9]*", numero),
+                   f"chave de questão inválida: {numero}")
+            exigir(isinstance(item, dict) and "questao" not in item,
+                   f"questão {numero}: usar a chave do objeto, sem campo questao")
+            try:
+                self.metadado(tema, dict(item, questao=int(numero)))
+            except (ValueError, OSError) as exc:
+                raise Erro(f"questão {numero}: {exc}") from exc
+        return mapa
+
     def metadados(self, tema):
-        caminho = self.local(caminho_tema(tema, "metadados"))
-        resultado = {}
-        if caminho.exists():
-            for n, item in linhas(caminho):
-                try:
-                    self.metadado(tema, item)
-                    exigir(item["questao"] not in resultado, "metadado duplicado para questão")
-                    resultado[item["questao"]] = item
-                except (ValueError, OSError) as exc:
-                    raise Erro(f"{caminho}:{n}: {exc}") from exc
-        return resultado
+        caminho = self.local(caminho_metadados(tema))
+        if not caminho.exists():
+            return {}
+        try:
+            return self.validar_mapa_metadados(tema, ler_json(caminho))
+        except (ValueError, OSError) as exc:
+            raise Erro(f"{caminho}: {exc}") from exc
 
     def consultar(self, identificador):
         q = self.questao(identificador)
         tema, numero = identificador.rsplit(".", 1)
         return {"id": identificador, "questao": q,
-                "metadados": self.metadados(tema).get(int(numero))}
+                "metadados": self.metadados(tema).get(numero)}
 
     def guardar_recurso(self, arquivo, mime):
         conteudo = Path(arquivo).read_bytes()
@@ -268,16 +283,15 @@ class Base:
         return item
 
     def registrar_metadados(self, tema, itens):
-        exigir(isinstance(itens, list) and itens, "fornecer lista não vazia de metadados")
+        exigir(isinstance(itens, dict) and itens, "fornecer objeto não vazio indexado pelo número da questão")
         with self.bloqueio():
             self.validar()
             existentes = self.metadados(tema)
-            for item in itens:
-                self.metadado(tema, item)
-                exigir(item["questao"] not in existentes, "questão já possui metadados; não sobrescrever")
-                existentes[item["questao"]] = item
-            conteudo = "".join(serializar(v) for v in existentes.values()).encode("utf-8")
-            atomico(self.local(caminho_tema(tema, "metadados")), conteudo)
+            self.validar_mapa_metadados(tema, itens)
+            exigir(not existentes.keys() & itens.keys(), "questão já possui metadados; não sobrescrever")
+            existentes.update(itens)
+            conteudo = serializar(existentes).encode("utf-8")
+            atomico(self.local(caminho_metadados(tema)), conteudo)
         return len(itens)
 
     def lote(self, manifesto, relatorio):
@@ -356,9 +370,12 @@ class Base:
             metas += len(self.metadados(tema))
         encontrados = {p.resolve() for p in self.local("dados").rglob("*.jsonl")}
         exigir(encontrados == previstos, "há arquivos de questões sem índice")
-        for p in self.local("metadados").rglob("*.jsonl"):
-            partes = p.relative_to(self.local("metadados")).with_suffix("").parts
-            exigir(len(partes) == 4 and ".".join(partes) in self.indice["temas"], f"metadados de tema desconhecido: {p}")
+        for p in self.local("dados").rglob("*_md.json"):
+            partes = p.relative_to(self.local("dados")).parts
+            tema = ".".join((*partes[:-1], p.name.removesuffix("_md.json")))
+            exigir(len(partes) == 4 and tema in self.indice["temas"], f"metadados de tema desconhecido: {p}")
+        exigir(not any(self.local("metadados").rglob("*.jsonl")),
+               "há metadados no formato antigo; migrar para dados/*_md.json")
         fingerprints = set()
         lotes = 0
         for pasta in self.local("importacoes").glob("*"):

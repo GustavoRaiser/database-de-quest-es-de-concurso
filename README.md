@@ -1,6 +1,6 @@
 # Base de questões de concurso
 
-Base local de questões organizada em arquivos por tema, com metadados, recursos locais e procedência de importações. Formato 2; CLI em Python 3.10 ou superior, sem dependências externas.
+Base local de questões organizada em arquivos por tema, com metadados, recursos locais e procedência de importações. Formato 3; CLI em Python 3.10 ou superior, sem dependências externas.
 
 ## Decisões do formato
 
@@ -65,15 +65,15 @@ python -m basequestoes --base . registrar-metadados ORGAO.CARGO.DISCIPLINA.TEMA 
 python -m basequestoes --base . registrar-lote lote.json
 ```
 
-`metadados-do-lote.json` contém uma lista de objetos. `lote.json` contém os objetos manifesto e relatorio. Veja o contrato e exemplos reais em [METADADOS.md](METADADOS.md) e [exemplos/base](exemplos/base/README.md). Metadados só podem referenciar questões já cadastradas; registros existentes não são sobrescritos.
+`metadados-do-lote.json` contém um objeto com números de questões como chaves (por exemplo, `{"3": {"origens": [...]}}`). `lote.json` contém os objetos manifesto e relatorio. Veja o contrato e exemplos reais em [METADADOS.md](METADADOS.md) e [exemplos/base](exemplos/base/README.md). Metadados só podem referenciar questões já cadastradas; registros existentes não são sobrescritos.
 
 Todos esses comandos preservam os arquivos em dados/. O registro de lote documenta questões existentes; ainda não extrai PDFs, acessa APIs, acrescenta questões, converte HTML ou executa OCR.
 
 O exemplo inclui imagem SVG fictícia, conteúdo original em JSON com HTML e gabarito cujo rótulo C corresponde à segunda alternativa. Recursos são guardados sem extensão e identificados por hash e tipo MIME; nenhum HTML ou SVG é renderizado pela CLI.
 
-## Complementos da versão 2
+## Complementos da versão 3
 
-- `metadados/`: um arquivo auxiliar por tema, com referência explícita à linha da questão.
+- `dados/.../TEMA_md.json`: arquivo auxiliar ao lado de `TEMA.jsonl`, com números de questões como chaves.
 - `recursos/`: arquivos compartilhados nomeados pelo SHA-256, sem duplicar bytes.
 - `importacoes/`: manifesto e relatório por lote, incluindo mapeamento e detecção de reenvio idêntico.
 - [METADADOS.md](METADADOS.md): contrato, migração e limites da implementação.
