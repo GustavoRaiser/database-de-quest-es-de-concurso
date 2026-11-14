@@ -18,6 +18,7 @@ function mostrar(item){
   a.append(elemento('p',campos.map(c=>item.classificacao[c].nome).join(' › ')));
   (m.textos_apoio||[]).forEach((t,i)=>{a.append(elemento('p',t,'texto'));recursos(a,rs,'texto_apoio',i+1);});
   recursos(a,rs,'antes_enunciado');a.append(elemento('p',item.questao[1],'texto'));recursos(a,rs,'apos_enunciado');
+  if(m.abordagem){const d=elemento('details');d.append(elemento('summary','O que esta questão aborda'),elemento('p',m.abordagem.sintese,'texto'),elemento('p','Conceitos: '+m.abordagem.conceitos.join(', ')),elemento('p',`Raciocínio: ${m.abordagem.raciocinio} · ${m.abordagem.geracao} · ${m.abordagem.estado}`));for(const p of m.abordagem.pendencias)d.append(elemento('p','Pendente: '+p));a.append(d);}
   const ol=elemento('ol');item.questao[2].forEach((t,i)=>{const li=elemento('li',t,'texto');recursos(li,rs,'assertiva',i+1);ol.append(li);});a.append(ol);
   if(m.gabarito){const d=elemento('details');d.append(elemento('summary','Ver gabarito'),elemento('p',`Situação: ${m.gabarito.situacao}. Posições corretas: ${m.gabarito.alternativas_corretas.join(', ')||'não informadas'}.`));a.append(d);}
   if(item.metadados){const d=elemento('details');d.append(elemento('summary','Metadados e procedência'),elemento('pre',JSON.stringify(m,null,2)));recursos(d,rs,'original');a.append(d);}

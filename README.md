@@ -92,3 +92,7 @@ Abra http://127.0.0.1:8000. Para consultar o acervo real, use `--base organizado
 No mesmo servidor local, abra **Adicionar material**. Crie um lote por prova/edição/caderno, adicione a prova e depois seus gabaritos e retificações. Também é possível selecionar arquivos colocados em captador/trabalho/entrada/. Veja o [Captador](captador/README.md). A prévia atual mostra documentos e pendências; a extração de questões pelo Digitalizador ainda será implementada.
 
 O Captador também mantém protocolos órgão.cargo.prova e um registro filtrável com banca, ano e outros atributos da prova. Só há encaminhamento ao Digitalizador com prova e gabarito vinculados e íntegros; a extração continua como próxima etapa.
+
+## Preparação para comparação de questões
+
+A [abordagem da cobrança](organizador/ABORDAGEM.md) prepara tarefas para IA em CLI/harness e registra perfis fundamentados nos metadados. O Emissor os apresenta junto da questão. A [avaliação do fluxo de PDF](digitalizador/AVALIACAO_PDF.md) distingue a recepção já funcional da extração ainda pendente. URLs de origem ainda não são baixadas automaticamente pelo Captador.

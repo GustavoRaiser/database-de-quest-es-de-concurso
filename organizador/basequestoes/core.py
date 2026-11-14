@@ -240,6 +240,13 @@ class Base:
         exigir(isinstance(item.get("textos_apoio", []), list)
                and all(isinstance(t, str) for t in item.get("textos_apoio", [])), "textos de apoio inválidos")
 
+        if 'abordagem' in item:
+            from .abordagem import validar
+            validar(item['abordagem'], q, item)
+        if 'historico_abordagens' in item:
+            exigir(isinstance(item['historico_abordagens'], list) and all(isinstance(v, dict) for v in item['historico_abordagens']),
+                   'histórico de abordagens deve ser lista de objetos')
+
     def validar_mapa_metadados(self, tema, mapa):
         tema_valido(tema)
         exigir(isinstance(mapa, dict), "metadados devem ser objeto indexado pelo número da questão")

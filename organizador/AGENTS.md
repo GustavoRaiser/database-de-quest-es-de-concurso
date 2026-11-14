@@ -38,3 +38,7 @@ python -m basequestoes --base exemplos/base validar
 ```
 
 Mudanças de organização física devem preservar o conteúdo dos registros, metadados e recursos. Atualizar links e comandos documentados. Bases são localizadas pelo argumento --base; não introduzir dependência do diretório raiz do Git para interpretar seus caminhos internos.
+
+## Preparação temática
+
+A abordagem da cobrança pertence ao Organizador; ler ABORDAGEM.md. Fornecer questão completa e apoios à IA/harness, preservar evidências, autoria, versão e vínculo ao conteúdo. Não usar palavras-chave como substituto de análise semântica. A ferramenta valida e registra perfis, mas não executa um modelo automaticamente. Não alterar categorias nem IDs como efeito da análise.

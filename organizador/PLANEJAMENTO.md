@@ -96,3 +96,5 @@ Não ordenar nem formatar automaticamente arquivos JSONL. Não resolver conflito
 ## Entrega mínima utilizável
 
 Leitor, validador, cadastro, inclusão, consulta, atualização de situação e reconstrução do índice, com verificações de preservação de linhas e gravação segura. Não é necessário construir uma interface web para começar.
+
+Implementada a preparação de abordagem via tarefa para IA/harness e o registro validado de perfis com evidências, hash, autoria e histórico. Os comandos preparar-abordagem e registrar-abordagens são executáveis. O modelo é executado pelo harness; scores e agrupamentos permanecem futuros.

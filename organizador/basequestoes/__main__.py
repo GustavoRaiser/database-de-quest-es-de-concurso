@@ -6,6 +6,7 @@ import sys
 
 from .core import Base, Erro, ler_json
 from .emissao import emitir, FILTROS
+from .abordagem import preparar, registrar
 
 
 def main():
@@ -14,6 +15,12 @@ def main():
     sub = parser.add_subparsers(dest="comando", required=True)
     sub.add_parser("validar")
     sub.add_parser("catalogos")
+    preparar_abordagem = sub.add_parser('preparar-abordagem')
+    preparar_abordagem.add_argument('id')
+    registrar_abordagens = sub.add_parser('registrar-abordagens')
+    registrar_abordagens.add_argument('tema')
+    registrar_abordagens.add_argument('arquivo')
+    registrar_abordagens.add_argument('--substituir', action='store_true')
     emissao = sub.add_parser("emitir")
     for campo in FILTROS:
         emissao.add_argument("--" + campo, default="")
@@ -36,6 +43,10 @@ def main():
             resultado = base.validar()
         elif args.comando == "catalogos":
             resultado = base.catalogos
+        elif args.comando == 'preparar-abordagem':
+            resultado = preparar(base, args.id)
+        elif args.comando == 'registrar-abordagens':
+            resultado = registrar(base, args.tema, ler_json(args.arquivo), args.substituir)
         elif args.comando == "emitir":
             resultado = emitir(base, {campo: getattr(args, campo) for campo in FILTROS}, args.pagina, args.por_pagina)
         elif args.comando == "consultar":

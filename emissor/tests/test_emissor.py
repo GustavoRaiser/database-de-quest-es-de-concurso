@@ -132,6 +132,44 @@ class EmissorTest(unittest.TestCase):
         with urlopen(self.url+'/captacao.js') as r:
             self.assertEqual(r.status,200)
 
+    def test_upload_pdf_completo_ate_fila(self):
+        import base64
+
+        def pdf(texto):
+            stream=f'BT /F1 12 Tf 30 100 Td ({texto}) Tj ET'.encode('ascii')
+            objetos=[b'<< /Type /Catalog /Pages 2 0 R >>',
+                     b'<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+                     b'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 200] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+                     b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+                     f'<< /Length {len(stream)} >>\nstream\n'.encode()+stream+b'\nendstream']
+            saida=b'%PDF-1.4\n';offsets=[0]
+            for i,obj in enumerate(objetos,1):
+                offsets.append(len(saida));saida+=f'{i} 0 obj\n'.encode()+obj+b'\nendobj\n'
+            xref=len(saida);saida+=b'xref\n0 6\n0000000000 65535 f \n'
+            for offset in offsets[1:]: saida+=f'{offset:010d} 00000 n \n'.encode()
+            return saida+f'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n'.encode()
+
+        with urlopen(self.url+'/api/captacao') as r:
+            token=json.load(r)['token_captacao']
+        headers={'Content-Type':'application/json','Origin':self.url,'X-Captacao-Token':token}
+        def post(acao,dados):
+            with urlopen(Request(self.url+'/api/captacao/'+acao,data=json.dumps(dados).encode(),headers=headers)) as r:
+                return json.load(r)
+        lote=post('criar',{'prova':'PDF de teste','edicao':'1','caderno':'A','orgao_id':'N32','cargo_id':'a2',
+                          'orgao':'Órgão fictício','cargo':'Cargo fictício','banca':'Banca de teste','ano':'2026'})
+        prova=pdf('Questao 1: escolha A ou B.')
+        for tipo,conteudo in [('prova',prova),('gabarito',pdf('Gabarito definitivo: 1 A.'))]:
+            dados={'lote':lote['id'],'nome':tipo+'.pdf','tipo':tipo,'conteudo_base64':base64.b64encode(conteudo).decode()}
+            if tipo=='gabarito': dados['situacao_gabarito']='definitivo'
+            lote=post('anexar',dados)
+        self.assertTrue(lote['liberado'])
+        original=Path(self.temp.name)/'captacoes/recebidos'/lote['id']/lote['documentos'][0]['arquivo']
+        self.assertEqual(original.read_bytes(),prova)
+        fila=post('encaminhar',{'lote':lote['id'],'gabarito_sha256':lote['documentos'][1]['sha256']})
+        self.assertEqual(fila['estado'],'aguardando_digitalizador')
+        self.assertTrue((Path(self.temp.name)/'captacoes'/fila['arquivo']).is_file())
+        self.assertEqual(self.get()['total'],5)  # Upload não criou questões extraídas.
+
 
 if __name__ == '__main__':
     unittest.main()

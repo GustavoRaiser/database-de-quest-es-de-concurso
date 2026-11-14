@@ -131,3 +131,7 @@ Para migrar uma base v2:
 Para uma base v1 sem complementos, atualizar o manifesto para a versão 3, acrescentar versao_metadados: 2, caminho_metadados e os diretórios recursos/importacoes conforme o manifesto de exemplo. Não alterar arquivos de questões.
 
 Os manifestos e o exemplo deste repositório já estão migrados. Não há comando automático de migração de bases externas nesta entrega.
+
+## Abordagem da cobrança
+
+Campo opcional abordagem, com critério versionado, hash do contexto, síntese, conteúdo exigido, recorte específico, conceitos, raciocínio, estrutura, evidências e autoria. O contrato e os comandos estão em [ABORDAGEM.md](ABORDAGEM.md). Reanálises explícitas preservam historico_abordagens. A extensão é compatível com o formato 3: registros anteriores sem perfil permanecem válidos.

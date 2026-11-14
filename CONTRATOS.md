@@ -60,3 +60,7 @@ O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar mate
 Protocolo ORGAO.CARGO.PROVA, com códigos iniciais compatíveis com o Organizador e terceiro segmento de prova exclusivo do Captador. O registro reside nos manifestos dos lotes, com banca, ano, escolaridade, áreas, localização, edição/caderno e histórico. A criação ou identificação verifica conflitos e duplicatas.
 
 Encaminhamento exige prova e gabarito íntegros, com vínculo validado novamente pela CLI. O usuário escolhe o gabarito, inclusive quando há versões preliminar/definitiva. O pacote v1 em encaminhamentos/HASH.json tem identificação, protocolo, descritores e referência relativa aos originais. Idempotência impede repetir o mesmo pacote. O futuro Digitalizador deve verificar se o pacote ainda é o encaminhamento atual do lote e conferir os hashes antes de consumir. Análise registrada manualmente exige encaminhamento e relatório e não equivale a execução automática. Sem ambos os documentos, não passa.
+
+## 9. Organizador → IA/harness → preparação do Compilador
+
+preparar-abordagem retorna tarefa v1 com conteúdo completo, apoios, recursos, classificação, hash e instruções. A IA do harness devolve perfil segundo o critério 1. registrar-abordagens valida correspondência ao contexto e evidências textuais e preserva o resultado no campo abordagem. Substituição explícita arquiva o perfil anterior. O contrato está em organizador/ABORDAGEM.md. Não implica geração automática, score ou agrupamento. Os perfis são acessíveis pelas consultas existentes.

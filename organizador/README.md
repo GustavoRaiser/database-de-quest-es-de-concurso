@@ -96,3 +96,7 @@ python -m basequestoes --base exemplos/base emitir --orgao N32 --pagina 1 --por-
 ```
 
 Filtros opcionais: --orgao, --cargo, --disciplina e --tema, com chaves completas dos catálogos. Sem filtros, inclui toda a base, paginada. A resposta inclui classificação legível e metadados. Ver [Emissor](../emissor/README.md) e o [contrato global](../CONTRATOS.md).
+
+## Abordagem da cobrança
+
+O Organizador prepara uma tarefa fundamentada para IA/harness e registra síntese, conhecimento exigido, recorte, conceitos, raciocínio, estrutura e evidências em abordagem nos metadados. Veja [ABORDAGEM.md](ABORDAGEM.md). Não há geração automática por modelo embutido nem agrupamento implementado.
