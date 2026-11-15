@@ -1,6 +1,6 @@
 # Compilador
 
-Compara questões e propõe relações e grupos de semelhança. Implementado em Python 3.10+, biblioteca padrão. O modo simples funciona sem modelos; o modo semântico opcional usa IA local, conforme SEMANTICA.md. Consome um snapshot público do Organizador e escreve resultados derivados em sua própria pasta de trabalho.
+Compara questões e propõe relações e grupos de semelhança. Implementado em Python 3.10+, biblioteca padrão. O modo simples funciona sem modelos; o modo semântico prioriza a IA do harness, conforme HARNESS.md. IA local exige habilitação expressa. Consome um snapshot público do Organizador e escreve resultados derivados em sua própria pasta de trabalho.
 
 A comparação considera os quatro critérios acordados: conteúdo exigido, recorte específico, raciocínio e estrutura/redação. Nesta versão, **o cálculo mede indícios lexicais**, aproveita conceitos e perfis existentes e informa dimensões ausentes. Não interpreta juridicamente o conhecimento necessário nem confirma equivalência semântica.
 
@@ -72,3 +72,7 @@ Testes cobrem 500 questões, dimensões ausentes, pares distintos/idênticos, pe
 ## Modo semântico adicional
 
 Implementado o modo conjunto lexical + IA local no Compilador, com saídas separadas, registro de execução, identificação de modelos, evidências e cache. A autorização de IA limita-se ao Compilador; os demais módulos seguem por código convencional. Ver [SEMANTICA.md](SEMANTICA.md). O serviço Ollama e modelos precisam estar instalados no ambiente executor; a avaliação real dos modelos e a preparação de runner semântico permanecem pendentes.
+
+## Semântica prioritária pelo harness
+
+`python compilador/app.py --base organizador semantica` prepara tarefas sem chamar modelos. O harness lê os arquivos e usa registrar-analises/consolidar-harness para entregar suas avaliações. Ver [HARNESS.md](HARNESS.md) para formato, retomada e histórico. O pipeline já prepara essa fila por padrão e distingue semantica_concluida da conclusão documental. O modo local anterior agora exige --provedor local --habilitar-ia-local.

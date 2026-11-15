@@ -48,7 +48,8 @@ def executar():
         with resumo.open('a',encoding='utf-8') as f:
             f.write('## Captação e digitalização\n\n')
             f.write('Resultado disponível no artefato **acervo-processado**.\n\n')
-            f.write('```json\n'+json.dumps({'contagens':r.get('contagens',{}), 'erro':r.get('erro'),'completo':r['completo']},ensure_ascii=False,indent=2)+'\n```\n')
+            f.write('```json\n'+json.dumps({'contagens':r.get('contagens',{}), 'erro':r.get('erro'),'completo':r['completo'],'semantica_concluida':r.get('semantica_concluida'),
+                            'harness':r.get('compilacao',{}).get('harness')},ensure_ascii=False,indent=2)+'\n```\n')
     return resultado.returncode
 
 

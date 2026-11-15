@@ -9,3 +9,7 @@ Frequência/recência e comparação com PDFs de estudo são necessidades poster
 ## Modo semântico adicional
 
 Implementado o modo conjunto lexical + IA local no Compilador, com saídas separadas, registro de execução, identificação de modelos, evidências e cache. A autorização de IA limita-se ao Compilador; os demais módulos seguem por código convencional. Ver [SEMANTICA.md](SEMANTICA.md). O serviço Ollama e modelos precisam estar instalados no ambiente executor; a avaliação real dos modelos e a preparação de runner semântico permanecem pendentes.
+
+## Prioridade semântica pelo harness
+
+O modo semântico padrão prepara tarefas para a IA do harness, com comandos de registro e consolidação, hashes de entrada, autoria/modelo declarados, retomada e histórico de respostas. Ver [HARNESS.md](HARNESS.md). O pipeline prepara essas tarefas após a análise lexical, sem invocar IA. A conclusão documental e a conclusão das respostas semânticas são estados distintos no relatório. IA local exige seleção explícita e --habilitar-ia-local, sem fallback automático.

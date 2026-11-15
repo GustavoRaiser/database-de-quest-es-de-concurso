@@ -102,3 +102,7 @@ O pipeline executa o [Compilador](../compilador/README.md) uma vez após as inco
 ## Relatórios de execução
 
 O pipeline publica o relatório por substituição atômica. Ao iniciar, marca em_execucao; erros de pedido/recepção geram estado falha e completo false, substituindo eventual relatório anterior. O adaptador GitHub também marca preparando antes de ler as entradas e registra falhas de preparação. Interrupções abruptas podem deixar estado intermediário, que nunca significa sucesso. A criação inicial da cópia da base no runner ocorre em pasta temporária, publicada somente depois de copiada.
+
+## Prioridade semântica pelo harness
+
+O modo semântico padrão prepara tarefas para a IA do harness, com comandos de registro e consolidação, hashes de entrada, autoria/modelo declarados, retomada e histórico de respostas. Ver [Compilador/harness](../compilador/HARNESS.md). O pipeline prepara essas tarefas após a análise lexical, sem invocar IA. A conclusão documental e a conclusão das respostas semânticas são estados distintos no relatório. IA local exige seleção explícita e --habilitar-ia-local, sem fallback automático.

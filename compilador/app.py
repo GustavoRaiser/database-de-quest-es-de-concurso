@@ -83,7 +83,7 @@ def compilar(base,saida,config,filtros=None,exaustivo=False):
     return salvar(resultado,saida,base)
 
 
-def compilar_hibrido(base,saida,config,semconfig,filtros=None,exaustivo=False,backend=None):
+def compilar_hibrido(base,saida,config,semconfig,filtros=None,exaustivo=False,backend=None,habilitar_ia_local=False):
     from datetime import datetime,timezone
     from uuid import uuid4
     from semantica import MotorSemantico,Ollama
@@ -97,6 +97,7 @@ def compilar_hibrido(base,saida,config,semconfig,filtros=None,exaustivo=False,ba
     try:
         snapshot=exportar(base,filtros or {})
         if snapshot['corpus_sha256']!=lexical['corpus_sha256']:raise ValueError('Base mudou entre as análises; repetir')
+        if backend is None and not habilitar_ia_local:raise ValueError('IA local desabilitada; use --habilitar-ia-local somente com autorização do usuário')
         backend=backend or Ollama(semconfig)
         motor=MotorSemantico(snapshot,config,semconfig,backend,Path(saida)/'cache_ia',gravar)
         analise=motor.analisar(exaustivo)
@@ -128,23 +129,42 @@ def main():
     comparar.add_argument('a');comparar.add_argument('b')
     similares=sub.add_parser('similares',help='busca questões relacionadas a um ID')
     similares.add_argument('id');similares.add_argument('--limite',type=int,default=10)
-    semantico=sub.add_parser('semantica',help='executa análises lexical e IA local separadas')
+    semantico=sub.add_parser('semantica',help='prepara harness por padrão; IA local exige habilitação explícita')
+    semantico.add_argument('--provedor',choices=('harness','local'),default='harness')
+    semantico.add_argument('--habilitar-ia-local',action='store_true')
     semantico.add_argument('--config',type=Path,default=Path(__file__).with_name('semantica.json'))
     semantico.add_argument('--exaustivo',action='store_true')
+    preparar=sub.add_parser('preparar-tarefas',help='gera tarefas para IA do harness sem chamar modelos')
+    preparar.add_argument('--exaustivo',action='store_true')
+    preparar.add_argument('--pares',type=Path,help='JSON [[ID_A,ID_B],...] para pares explícitos')
+    estado=sub.add_parser('estado-tarefas');estado.add_argument('lote');estado.add_argument('--limite',type=int,default=5)
+    registro=sub.add_parser('registrar-analises');registro.add_argument('lote');registro.add_argument('respostas',type=Path);registro.add_argument('--substituir',action='store_true')
+    consolidacao=sub.add_parser('consolidar-harness');consolidacao.add_argument('lote')
     consulta=sub.add_parser('consultar',help='lê compilação arquivada pelo hash')
     consulta.add_argument('id')
-    for parser in (analisar,comparar,similares,semantico):
+    for parser in (analisar,comparar,similares,semantico,preparar):
         for campo in FILTROS:parser.add_argument('--'+campo,default='')
     for parser in (analisar,similares):parser.add_argument('--exaustivo',action='store_true')
     args=p.parse_args()
     try:
-        if args.comando=='consultar':resultado=consultar(args.saida,args.id)
+        if args.comando in ('estado-tarefas','registrar-analises','consolidar-harness'):
+            import harness
+            if args.comando=='estado-tarefas':resultado=harness.estado(args.saida,args.lote,args.limite)
+            elif args.comando=='registrar-analises':resultado=harness.registrar(args.base,args.saida,args.lote,harness.ler(args.respostas),args.substituir)
+            else:resultado=harness.consolidar(args.base,args.saida,args.lote)
+        elif args.comando=='consultar':resultado=consultar(args.saida,args.id)
         else:
             config=json.loads(args.criterios.read_text(encoding='utf-8'))
             validar_config(config)
             filtros={k:getattr(args,k) for k in FILTROS}
-            if args.comando=='semantica':
-                resultado=compilar_hibrido(args.base,args.saida,config,json.loads(args.config.read_text(encoding='utf-8')),filtros,args.exaustivo)
+            if args.comando=='preparar-tarefas' or (args.comando=='semantica' and args.provedor=='harness'):
+                import harness
+                if getattr(args,'habilitar_ia_local',False):raise ValueError('Habilitação local só é válida com --provedor local')
+                pares=harness.ler(args.pares) if getattr(args,'pares',None) else None
+                resultado=harness.preparar(args.base,args.saida,config,filtros,args.exaustivo,pares)
+            elif args.comando=='semantica':
+                if not args.habilitar_ia_local:raise ValueError('IA local desabilitada; use --habilitar-ia-local explicitamente')
+                resultado=compilar_hibrido(args.base,args.saida,config,json.loads(args.config.read_text(encoding='utf-8')),filtros,args.exaustivo,habilitar_ia_local=True)
             elif args.comando=='analisar':resultado=compilar(args.base,args.saida,config,filtros,args.exaustivo)
             else:
                 snapshot=exportar(args.base,filtros);motor=Motor(snapshot,config)
@@ -161,7 +181,7 @@ def main():
                                'candidatas_comparadas':len(candidatas),'busca_truncada':truncado,
                                'exaustivo':args.exaustivo,'criterios_sha256':digest(config)}
         print(json.dumps(resultado,ensure_ascii=False,indent=2))
-        if args.comando=='semantica' and not resultado['completo']:
+        if args.comando=='semantica' and args.provedor=='local' and not resultado['completo']:
             print('Análise semântica incompleta; registro: '+resultado['registro'],file=sys.stderr)
             return 2
         return 0

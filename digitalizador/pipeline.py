@@ -38,6 +38,12 @@ def executar(entrada, captacoes, saida, base, compilacoes=None):
         return cli([sys.executable,str(ROOT/'captador/app.py'),'--raiz',str(captacoes),acao],dados)
     def org(acao,dados):
         return cli([sys.executable,'-m','basequestoes','--base',str(base),acao],dados,ROOT/'organizador')
+    modo=entrada.get('analise_semantica','harness')
+    if modo not in ('harness','local','nenhuma'):raise ValueError('Modo semântico inválido')
+    if modo=='local' and entrada.get('habilitar_ia_local') is not True:
+        raise ValueError('IA local exige habilitar_ia_local=true por autorização expressa')
+    if modo!='local' and entrada.get('semantica'):
+        raise ValueError('Configuração local exige analise_semantica=local e habilitação explícita')
     recebidos = cap('receber',entrada)
     resultados = []
     for reserva in recebidos['reservas']:
@@ -79,17 +85,23 @@ def executar(entrada, captacoes, saida, base, compilacoes=None):
             pasta_compilador=Path(compilacoes or ROOT/'compilador/trabalho').resolve()
             c=cli([sys.executable,str(ROOT/'compilador/app.py'),'--base',str(base),
                    '--saida',str(pasta_compilador),'analisar'])
-            if entrada.get('semantica'):
+            if modo=='local':
                 h=cli([sys.executable,str(ROOT/'compilador/app.py'),'--base',str(base),
-                       '--saida',str(pasta_compilador),'semantica','--config',str(Path(entrada['semantica']).resolve())])
+                       '--saida',str(pasta_compilador),'semantica','--provedor','local','--habilitar-ia-local',
+                       '--config',str(Path(entrada.get('semantica') or ROOT/'compilador/semantica.json').resolve())])
                 c['semantica_registro']=h['registro']
+            elif modo=='harness':
+                c['harness']=cli([sys.executable,str(ROOT/'compilador/app.py'),'--base',str(base),
+                                  '--saida',str(pasta_compilador),'preparar-tarefas'])
             compilacao={'estado':'compilado','id':c['id'],'arquivo':c['arquivo'],
-                        'corpus_sha256':c['corpus_sha256'],'diagnostico':c['diagnostico'],'semantica_registro':c.get('semantica_registro')}
+                        'corpus_sha256':c['corpus_sha256'],'diagnostico':c['diagnostico'],'semantica_registro':c.get('semantica_registro'),'harness':c.get('harness')}
         except (ValueError,OSError,subprocess.SubprocessError) as exc:
             compilacao={'estado':'falha','erro':str(exc)}
     return {'versao':1,'ambiente':'execução local; IA somente no Compilador quando configurada',
             'captacoes':str(captacoes),'base':str(base),'resultados':resultados,
             'contagens':contagens,'erros_recepcao':recebidos['erros'],'compilacao':compilacao,
+            'analise_semantica':modo,
+            'semantica_concluida':(compilacao.get('harness') or {}).get('pendentes',1)==0 if modo=='harness' else modo=='local' and compilacao['estado']=='compilado',
             'completo':bool(resultados) and not recebidos['erros'] and compilacao['estado']=='compilado' and all(r['estado'] in ('incorporado','ja_incorporado') for r in resultados)}
 
 
@@ -105,6 +117,8 @@ def main():
     p.add_argument('--base',type=Path,default=ROOT/'organizador')
     p.add_argument('--relatorio',type=Path,default=ROOT/'digitalizador/trabalho/pipeline.json')
     p.add_argument('--compilacoes',type=Path,default=ROOT/'compilador/trabalho')
+    p.add_argument('--analise-semantica',choices=('harness','local','nenhuma'))
+    p.add_argument('--habilitar-ia-local',action='store_true')
     p.add_argument('--semantica',type=Path,help='configuração opcional de IA local exclusiva do Compilador')
     args = p.parse_args()
     try:
@@ -113,6 +127,8 @@ def main():
         entrada = json.loads(args.pedido.read_text(encoding='utf-8')) if args.pedido else {}
         if not isinstance(entrada,dict):raise ValueError('Pedido deve ser objeto JSON')
         if not isinstance(entrada.get('identificacao',{}),dict):raise ValueError('Identificação deve ser objeto JSON')
+        if args.analise_semantica: entrada['analise_semantica']=args.analise_semantica
+        if args.habilitar_ia_local: entrada['habilitar_ia_local']=True
         if args.semantica: entrada['semantica']=str(args.semantica.resolve())
         if args.url: entrada['urls'] = args.url
         if args.pasta: entrada['pasta'] = str(args.pasta.resolve())

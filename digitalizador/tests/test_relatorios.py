@@ -31,3 +31,12 @@ class RelatorioTest(unittest.TestCase):
                 self.assertEqual(adaptador.main(),1)
             r=json.loads((trabalho/'relatorio.json').read_text())
             self.assertFalse(r['completo']);self.assertEqual(r['estado'],'falha')
+
+class LocalGateTest(unittest.TestCase):
+    def test_pipeline_bloqueia_local_antes_de_captacao(self):
+        spec=importlib.util.spec_from_file_location('pipeline_gate',ROOT/'digitalizador/pipeline.py')
+        m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(m,'cli',side_effect=AssertionError('Não deveria iniciar captação')):
+                with self.assertRaisesRegex(ValueError,'habilitar_ia_local'):
+                    m.executar({'analise_semantica':'local'},Path(tmp)/'cap',Path(tmp)/'dig',Path(tmp)/'base')

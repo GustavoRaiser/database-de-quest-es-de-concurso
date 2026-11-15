@@ -65,7 +65,7 @@ def validar_resposta(r,a,b):
     if not isinstance(r,dict) or not isinstance(r.get('dimensoes'),dict) or set(r['dimensoes'])!=set(CAMPOS):raise ValueError('Resposta IA sem as quatro dimensões')
     if not isinstance(r.get('avisos'),list) or not all(isinstance(t,str) for t in r['avisos']):raise ValueError('Avisos IA inválidos')
     for d in r['dimensoes'].values():
-        if not isinstance(d,dict) or not isinstance(d.get('justificativa'),str):raise ValueError('Dimensão IA inválida')
+        if not isinstance(d,dict) or 'score' not in d or not isinstance(d.get('justificativa'),str):raise ValueError('Dimensão IA inválida')
         s=d.get('score')
         if s is not None:
             if type(s) not in (int,float) or not math.isfinite(s) or not 0<=s<=100:raise ValueError('Score IA inválido')

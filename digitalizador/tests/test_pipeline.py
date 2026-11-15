@@ -32,6 +32,9 @@ class PipelineTest(unittest.TestCase):
             self.assertEqual(r['resultados'][0]['novas_questoes'],80)
             self.assertEqual(r['compilacao']['estado'],'compilado')
             self.assertEqual(r['compilacao']['diagnostico']['questoes'],80)
+            self.assertEqual(r['compilacao']['harness']['provedor'],'harness')
+            self.assertGreater(r['compilacao']['harness']['pendentes'],0)
+            self.assertFalse(r['semantica_concluida'])
             arquivos = {p.relative_to(base):p.read_bytes() for p in (base/'dados').rglob('*') if p.is_file()}
             r2 = pipeline.executar(entrada,cap,saida,base,tmp/'compilador')
             self.assertTrue(r2['completo'],r2)

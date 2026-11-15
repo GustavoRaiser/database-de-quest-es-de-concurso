@@ -1,4 +1,6 @@
-# Análises lexical e semântica coexistentes
+# Alternativa local — análises lexical e semântica coexistentes
+
+**Prioridade atual:** usar a IA do harness, conforme [HARNESS.md](HARNESS.md). Este documento descreve a alternativa local, que requer habilitação expressa do usuário. O comando semantica sem provedor agora prepara tarefas harness.
 
 A autorização do usuário amplia o Compilador: ele pode usar modelos locais de IA. Captador, Digitalizador, Organizador e Emissor continuam sem inferência de modelos. Nenhum enunciado é enviado a API externa de inferência. O modo lexical permanece independente, executável e disponível em todos os resultados conjuntos.
 
@@ -24,16 +26,16 @@ ollama pull qwen3:4b
 Com o serviço Ollama ativo:
 
 ```sh
-python compilador/app.py --base organizador semantica
+python compilador/app.py --base organizador semantica --provedor local --habilitar-ia-local
 ```
 
 Ou executar o pipeline completo com as duas análises:
 
 ```sh
-python digitalizador/pipeline.py --pasta captador/entrada --situacao-gabarito definitivo --semantica compilador/semantica.json
+python digitalizador/pipeline.py --pasta captador/entrada --situacao-gabarito definitivo --analise-semantica local --habilitar-ia-local --semantica compilador/semantica.json
 ```
 
-A condição definitivo é declaração da fonte, como no pipeline anterior. No pedido JSON, a opção equivalente é `"semantica":"compilador/semantica.json"`. A configuração é opcional: sem ela, o pipeline continua lexical. O comando semantica sempre executa ambas as análises; não há substituição silenciosa.
+A condição definitivo é declaração da fonte, como no pipeline anterior. No pedido JSON, a opção equivalente é `"analise_semantica":"local","habilitar_ia_local":true,"semantica":"compilador/semantica.json"`. A configuração local é opcional; sem seleção e habilitação local o pipeline prepara a fila harness. O comando semantica --provedor local --habilitar-ia-local executa ambas as análises; sem essa seleção explícita, o comando prepara o harness.
 
 A escolha inicial é embeddinggemma para representação multilíngue e qwen3:4b para avaliação estruturada. São modelos genéricos, ainda não calibrados em concursos jurídicos. O arquivo semantica.json permite escolher outros modelos instalados, tamanho de trecho, vizinhança e timeout. O serviço é limitado a HTTP em localhost/127.0.0.1/::1. O programa não instala modelos automaticamente.
 
@@ -69,7 +71,7 @@ Modelos podem produzir justificativas incorretas mesmo com citações literais. 
 
 ## GitHub e verificação
 
-O workflow atual de captação permanece lexical por padrão. O modo semântico exige preparar um runner com Ollama e modelos locais; publicar o código não instala esse serviço no runner. Nesta entrega não há download automático de pesos nem execução remota de IA. O mesmo comando Python pode ser usado em runner preparado ou desktop; as saídas devem ser incluídas em backup/artefato daquele ambiente.
+O workflow atual de captação executa a análise lexical e prepara tarefas harness por padrão, sem inferência automática. O modo semântico exige preparar um runner com Ollama e modelos locais; publicar o código não instala esse serviço no runner. Nesta entrega não há download automático de pesos nem execução remota de IA. O mesmo comando Python pode ser usado em runner preparado ou desktop; as saídas devem ser incluídas em backup/artefato daquele ambiente.
 
 Testes: `python -m unittest discover -s compilador/tests -v`. Cobrem coexistência, registros de falha, cache/invalidação, rejeição de citação inventada, textos extensos, estados e grupos. Antes de usar scores como critério de estudo, avaliar pares reais rotulados, incluindo sinônimos, regras/exceções próximas, negações e distratores. Essa calibração permanece pendente.
 
