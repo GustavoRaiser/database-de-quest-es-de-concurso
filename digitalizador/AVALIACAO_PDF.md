@@ -2,6 +2,8 @@
 
 Avaliação do repositório após a implementação da abordagem da cobrança. A conclusão distingue os passos executáveis hoje dos ainda pendentes.
 
+Atualização de 15/11/2026: consulte o [teste real do ENAM 2026.1](TESTE_ENAM_2026_1.md). Ele complementa a avaliação abaixo com documentos reais e extração experimental externa, sem converter o diagnóstico em ferramenta do repositório.
+
 | Etapa | Estado e evidência |
 |---|---|
 | Selecionar PDF no navegador e enviar | Implementado no Emissor/Captador, com limite de 15 MiB por arquivo |

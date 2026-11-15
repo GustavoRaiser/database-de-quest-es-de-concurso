@@ -4,6 +4,8 @@ Agente responsável por transformar documentos e fontes estruturadas em candidat
 
 **Estado:** pasta e instruções preparadas. Ainda não existe código, CLI, OCR, extrator de PDF ou workflow de GitHub Actions neste módulo.
 
+Foi realizado um [teste real com a URL do ENAM 2026.1](TESTE_ENAM_2026_1.md): o Captador recebeu prova e gabarito, e um diagnóstico externo separou 80 questões e associou as respostas. O extrator utilizado no diagnóstico ainda não integra este módulo.
+
 ## Entradas e saídas previstas
 
 | Entrada | Entrega esperada |
