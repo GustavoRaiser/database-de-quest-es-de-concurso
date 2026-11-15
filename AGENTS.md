@@ -60,7 +60,7 @@ Guiar a evolução por OBJETIVO.md: permitir que IA em CLI/harness compare tópi
 
 ## Execução sem IA
 
-Por decisão do usuário, download, extração, associação de gabarito, descritores e cálculos são executados por código no servidor/host/computador. Não introduzir chamadas a modelos na operação. IA pode ajudar a desenvolver as ferramentas e consumir resultados posteriormente. Regras lexicais não equivalem a interpretação semântica: rotular limitações e retornar Não identificado quando não houver correspondência. O extrator atual suporta apenas o perfil ENAM/FGV Tipo 1 documentado no Digitalizador.
+Por decisão do usuário, download, extração, associação de gabarito, descritores e cálculos são executados por código no servidor/host/computador. A autorização posterior do usuário permite IA local exclusivamente no modo semântico do Compilador; os demais módulos continuam sem modelos. IA pode ajudar a desenvolver as ferramentas e consumir resultados posteriormente. Regras lexicais não equivalem a interpretação semântica: rotular limitações e retornar Não identificado quando não houver correspondência. O extrator atual suporta apenas o perfil ENAM/FGV Tipo 1 documentado no Digitalizador.
 
 ## Harness, arquivos e ambiente de execução
 
@@ -71,3 +71,7 @@ Executar no ambiente receptor: GitHub Actions para captação no GitHub, CLI loc
 Incorporação é responsabilidade exclusiva do Organizador via CLI pública. IDs por linha são preservados; mesmo PDF no mesmo órgão/cargo não duplica questões. Não remover marcadores ou arquivos de transação pendente para liberar leitura: usar recuperar. Tema Não classificado e descritores propostos não equivalem a classificação semântica confirmada.
 
 O Compilador é executado após a incorporação pelo pipeline, via sua CLI pública. Ler [compilador/AGENTS.md](compilador/AGENTS.md). Scores iniciais são lexicais; preservar cobertura, avisos e pares não comparados. Grupos não são categorias nem confirmação semântica e não autorizam mover ou fundir questões.
+
+## IA semântica autorizada
+
+Ler [compilador/SEMANTICA.md](compilador/SEMANTICA.md). A análise lexical deve coexistir com a semântica em arquivos próprios. Registrar execução, modelos/digests, corpus, cache e falhas; não substituir resultado simples por resultado IA nem usar IA nos demais funcionários.

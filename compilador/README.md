@@ -1,6 +1,6 @@
 # Compilador
 
-Compara questões e propõe relações e grupos de semelhança. Implementado em Python 3.10+, somente biblioteca padrão, sem chamadas a modelos ou rede. Consome um snapshot público do Organizador e escreve resultados derivados em sua própria pasta de trabalho.
+Compara questões e propõe relações e grupos de semelhança. Implementado em Python 3.10+, biblioteca padrão. O modo simples funciona sem modelos; o modo semântico opcional usa IA local, conforme SEMANTICA.md. Consome um snapshot público do Organizador e escreve resultados derivados em sua própria pasta de trabalho.
 
 A comparação considera os quatro critérios acordados: conteúdo exigido, recorte específico, raciocínio e estrutura/redação. Nesta versão, **o cálculo mede indícios lexicais**, aproveita conceitos e perfis existentes e informa dimensões ausentes. Não interpreta juridicamente o conhecimento necessário nem confirma equivalência semântica.
 
@@ -68,3 +68,7 @@ python -m unittest discover -s compilador/tests -v
 ```
 
 Testes cobrem 500 questões, dimensões ausentes, pares distintos/idênticos, perfis, negação/visuais, grupos sem propagação transitiva, busca limitada/exaustiva, snapshot com mais de 100 questões, preservação da base e reprodutibilidade entre processos. Ver [VERIFICACAO.md](VERIFICACAO.md).
+
+## Modo semântico adicional
+
+Implementado o modo conjunto lexical + IA local no Compilador, com saídas separadas, registro de execução, identificação de modelos, evidências e cache. A autorização de IA limita-se ao Compilador; os demais módulos seguem por código convencional. Ver [SEMANTICA.md](SEMANTICA.md). O serviço Ollama e modelos precisam estar instalados no ambiente executor; a avaliação real dos modelos e a preparação de runner semântico permanecem pendentes.

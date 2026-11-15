@@ -1,0 +1,9 @@
+{
+  "versao": 1,
+  "url": "http://127.0.0.1:11434",
+  "embedding": "embeddinggemma",
+  "avaliador": "qwen3:4b",
+  "vizinhos": 10,
+  "chunk_caracteres": 1200,
+  "timeout": 180
+}

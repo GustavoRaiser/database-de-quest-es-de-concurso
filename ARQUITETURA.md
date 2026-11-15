@@ -77,3 +77,7 @@ O workflow GitHub Actions e o desktop executam as mesmas CLIs. Captador reserva 
 Pasta compilador/: recebe um snapshot público do Organizador, busca candidatas por índice invertido, compara os quatro critérios, registra scores e propõe grupos com vínculo direto entre todos os membros. Pode executar sozinho ou após a incorporação no pipeline. Salva resultados derivados e índices de vizinhos em sua própria pasta de trabalho, sem modificar dados/metadados/IDs. O Emissor continua consultando o acervo e ainda não mostra grupos na tela. Ver compilador/README.md.
 
 Fluxo atual: Captador → Digitalizador → Organizador → Compilador; o Emissor consulta o acervo em paralelo e poderá consumir as relações pela CLI. No GitHub, o artefato inclui as compilações do mesmo ambiente; no desktop, elas ficam locais.
+
+## Modo semântico adicional
+
+Implementado o modo conjunto lexical + IA local no Compilador, com saídas separadas, registro de execução, identificação de modelos, evidências e cache. A autorização de IA limita-se ao Compilador; os demais módulos seguem por código convencional. Ver [compilador/SEMANTICA.md](compilador/SEMANTICA.md). O serviço Ollama e modelos precisam estar instalados no ambiente executor; a avaliação real dos modelos e a preparação de runner semântico permanecem pendentes.

@@ -1,4 +1,4 @@
-"""Compilador de relações entre questões. Biblioteca padrão; sem IA e sem rede."""
+"""Compilador de relações entre questões. Biblioteca padrão; modo lexical e modo IA local opcional."""
 import argparse
 import hashlib
 import json
@@ -83,6 +83,40 @@ def compilar(base,saida,config,filtros=None,exaustivo=False):
     return salvar(resultado,saida,base)
 
 
+def compilar_hibrido(base,saida,config,semconfig,filtros=None,exaustivo=False,backend=None):
+    from datetime import datetime,timezone
+    from uuid import uuid4
+    from semantica import MotorSemantico,Ollama
+    lexical=compilar(base,saida,config,filtros,exaustivo)
+    registro={'versao':1,'inicio':datetime.now(timezone.utc).isoformat(),
+              'lexical':{'id':lexical['id'],'arquivo':lexical['arquivo'],'estado':'concluida'},
+              'semantica':{'estado':'em_execucao'},'completo':False}
+    path=Path(saida)/'registros'/(uuid4().hex+'.json')
+    def gravar(p,d):atomico(p,canon(d).encode())
+    gravar(path,registro)
+    try:
+        snapshot=exportar(base,filtros or {})
+        if snapshot['corpus_sha256']!=lexical['corpus_sha256']:raise ValueError('Base mudou entre as análises; repetir')
+        backend=backend or Ollama(semconfig)
+        motor=MotorSemantico(snapshot,config,semconfig,backend,Path(saida)/'cache_ia',gravar)
+        analise=motor.analisar(exaustivo)
+        impl=digest({n:hashlib.sha256(Path(__file__).with_name(n).read_bytes()).hexdigest() for n in ('app.py','motor.py','semantica.py')})
+        resultado={'versao':1,'algoritmo':'semantica_local/1','estado':'proposta_semantica_ia',
+                   'corpus_sha256':snapshot['corpus_sha256'],'implementacao_sha256':impl,
+                   'analise_lexical_id':lexical['id'],'criterios_sha256':digest(config),'configuracao':config,'semantica_configuracao':semconfig,
+                   'filtros':filtros or {},'provas':snapshot['provas'],**analise}
+        # Ponteiros próprios: uma compilação semântica nunca substitui ultimo.json lexical.
+        sem=salvar(resultado,Path(saida)/'semantica',base)
+        registro['semantica']={'estado':'parcial' if analise['pendencias_ia'] else 'concluida',
+                              'id':sem['id'],'arquivo':sem['arquivo'],'processamento_ia':analise['processamento_ia'],
+                              'pendencias':analise['pendencias_ia'],'modelos':backend.modelos}
+        registro['completo']=not analise['pendencias_ia']
+    except (ValueError,OSError,KeyError,TypeError) as exc:
+        registro['semantica']={'estado':'falha','erro':str(exc)}
+    registro['fim']=datetime.now(timezone.utc).isoformat();gravar(path,registro)
+    return dict(registro,registro=str(path))
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--base',type=Path,default=ROOT/'organizador')
@@ -94,9 +128,12 @@ def main():
     comparar.add_argument('a');comparar.add_argument('b')
     similares=sub.add_parser('similares',help='busca questões relacionadas a um ID')
     similares.add_argument('id');similares.add_argument('--limite',type=int,default=10)
+    semantico=sub.add_parser('semantica',help='executa análises lexical e IA local separadas')
+    semantico.add_argument('--config',type=Path,default=Path(__file__).with_name('semantica.json'))
+    semantico.add_argument('--exaustivo',action='store_true')
     consulta=sub.add_parser('consultar',help='lê compilação arquivada pelo hash')
     consulta.add_argument('id')
-    for parser in (analisar,comparar,similares):
+    for parser in (analisar,comparar,similares,semantico):
         for campo in FILTROS:parser.add_argument('--'+campo,default='')
     for parser in (analisar,similares):parser.add_argument('--exaustivo',action='store_true')
     args=p.parse_args()
@@ -106,7 +143,9 @@ def main():
             config=json.loads(args.criterios.read_text(encoding='utf-8'))
             validar_config(config)
             filtros={k:getattr(args,k) for k in FILTROS}
-            if args.comando=='analisar':resultado=compilar(args.base,args.saida,config,filtros,args.exaustivo)
+            if args.comando=='semantica':
+                resultado=compilar_hibrido(args.base,args.saida,config,json.loads(args.config.read_text(encoding='utf-8')),filtros,args.exaustivo)
+            elif args.comando=='analisar':resultado=compilar(args.base,args.saida,config,filtros,args.exaustivo)
             else:
                 snapshot=exportar(args.base,filtros);motor=Motor(snapshot,config)
                 if args.comando=='comparar':
@@ -122,6 +161,9 @@ def main():
                                'candidatas_comparadas':len(candidatas),'busca_truncada':truncado,
                                'exaustivo':args.exaustivo,'criterios_sha256':digest(config)}
         print(json.dumps(resultado,ensure_ascii=False,indent=2))
+        if args.comando=='semantica' and not resultado['completo']:
+            print('Análise semântica incompleta; registro: '+resultado['registro'],file=sys.stderr)
+            return 2
         return 0
     except (OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError) as exc:
         print('Erro: '+str(exc),file=sys.stderr);return 1

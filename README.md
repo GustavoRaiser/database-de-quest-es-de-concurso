@@ -129,3 +129,7 @@ O [Compilador](compilador/README.md) tem código próprio e roda ao final das in
 ## Revisão e testes automáticos
 
 A [revisão geral de integração](REVISAO.md) registra cobertura, correções e pendências atuais. O workflow Testes de integração executa as cinco suítes e valida as bases em pushes para main e pull requests, em Linux e Windows. A execução local verificada é descrita no relatório; a matriz remota tem resultados próprios no Actions.
+
+## Modo semântico adicional
+
+Implementado o modo conjunto lexical + IA local no Compilador, com saídas separadas, registro de execução, identificação de modelos, evidências e cache. A autorização de IA limita-se ao Compilador; os demais módulos seguem por código convencional. Ver [compilador/SEMANTICA.md](compilador/SEMANTICA.md). O serviço Ollama e modelos precisam estar instalados no ambiente executor; a avaliação real dos modelos e a preparação de runner semântico permanecem pendentes.

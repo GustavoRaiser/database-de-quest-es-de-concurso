@@ -86,3 +86,7 @@ A CLI pública exportar recebe os mesmos filtros de emitir e retorna um snapshot
 O Compilador preserva IDs/ocorrências e escreve somente artefatos derivados. analisar gera scores por par e grupos propostos; comparar e similares oferecem consulta por ID; consultar lê resultado arquivado por hash. Nenhuma relação lexical altera o tema ou confirma equivalência semântica. Não identificado/indeterminado não é coincidência positiva. Grupos não aplicam transitividade.
 
 O pipeline chama analisar uma vez após as incorporações bem-sucedidas do pedido, sobre todo o acervo, com saída definida por --compilacoes. Falha dessa etapa é registrada separadamente e não desfaz as incorporações já validadas; torna a execução incompleta. No GitHub, compilador/ acompanha o artefato acervo-processado. Emissor ainda não apresenta os grupos na interface visual.
+
+## Modo semântico adicional
+
+Implementado o modo conjunto lexical + IA local no Compilador, com saídas separadas, registro de execução, identificação de modelos, evidências e cache. A autorização de IA limita-se ao Compilador; os demais módulos seguem por código convencional. Ver [compilador/SEMANTICA.md](compilador/SEMANTICA.md). O serviço Ollama e modelos precisam estar instalados no ambiente executor; a avaliação real dos modelos e a preparação de runner semântico permanecem pendentes.

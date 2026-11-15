@@ -79,11 +79,15 @@ def executar(entrada, captacoes, saida, base, compilacoes=None):
             pasta_compilador=Path(compilacoes or ROOT/'compilador/trabalho').resolve()
             c=cli([sys.executable,str(ROOT/'compilador/app.py'),'--base',str(base),
                    '--saida',str(pasta_compilador),'analisar'])
+            if entrada.get('semantica'):
+                h=cli([sys.executable,str(ROOT/'compilador/app.py'),'--base',str(base),
+                       '--saida',str(pasta_compilador),'semantica','--config',str(Path(entrada['semantica']).resolve())])
+                c['semantica_registro']=h['registro']
             compilacao={'estado':'compilado','id':c['id'],'arquivo':c['arquivo'],
-                        'corpus_sha256':c['corpus_sha256'],'diagnostico':c['diagnostico']}
+                        'corpus_sha256':c['corpus_sha256'],'diagnostico':c['diagnostico'],'semantica_registro':c.get('semantica_registro')}
         except (ValueError,OSError,subprocess.SubprocessError) as exc:
             compilacao={'estado':'falha','erro':str(exc)}
-    return {'versao':1,'ambiente':'execução local ao processo; sem chamadas a modelos',
+    return {'versao':1,'ambiente':'execução local; IA somente no Compilador quando configurada',
             'captacoes':str(captacoes),'base':str(base),'resultados':resultados,
             'contagens':contagens,'erros_recepcao':recebidos['erros'],'compilacao':compilacao,
             'completo':bool(resultados) and not recebidos['erros'] and compilacao['estado']=='compilado' and all(r['estado'] in ('incorporado','ja_incorporado') for r in resultados)}
@@ -101,6 +105,7 @@ def main():
     p.add_argument('--base',type=Path,default=ROOT/'organizador')
     p.add_argument('--relatorio',type=Path,default=ROOT/'digitalizador/trabalho/pipeline.json')
     p.add_argument('--compilacoes',type=Path,default=ROOT/'compilador/trabalho')
+    p.add_argument('--semantica',type=Path,help='configuração opcional de IA local exclusiva do Compilador')
     args = p.parse_args()
     try:
         gravar_relatorio(args.relatorio,{'versao':1,'estado':'em_execucao','completo':False,
@@ -108,6 +113,7 @@ def main():
         entrada = json.loads(args.pedido.read_text(encoding='utf-8')) if args.pedido else {}
         if not isinstance(entrada,dict):raise ValueError('Pedido deve ser objeto JSON')
         if not isinstance(entrada.get('identificacao',{}),dict):raise ValueError('Identificação deve ser objeto JSON')
+        if args.semantica: entrada['semantica']=str(args.semantica.resolve())
         if args.url: entrada['urls'] = args.url
         if args.pasta: entrada['pasta'] = str(args.pasta.resolve())
         if args.situacao_gabarito: entrada['situacao_gabarito'] = args.situacao_gabarito
