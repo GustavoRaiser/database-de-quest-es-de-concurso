@@ -98,3 +98,7 @@ O usuário definiu que o processamento dos dados deve ocorrer por programas no s
 ## Atualização operacional — 15/11/2026
 
 A incorporação de extrações ENAM/FGV Tipo 1 já preserva ficha durável em provas/ORGAO/CARGO/SHA_PROVA.json, referenciada nos metadados da questão e acompanhada de documentos locais e mapeamento dos números originais. Pipeline CLI e GitHub Actions percorrem da recepção à base, com temas Não classificado onde não há confirmação. Isso implementa parte das prioridades acima; não implementa estatísticas, classificação semântica, precisão mensal nova, fusão de cadernos, Compilador ou comparação com apostilas. Ver organizador/INCORPORACAO.md e digitalizador/OPERACAO.md.
+
+## Compilador — implementação inicial
+
+O Compilador agora gera relações/grupos propostos por critérios lexicais, preservando o vínculo com provas e números originais. Usa score graduado, cobertura e evidências por par; não resolve classificação semântica nem contagem de cobranças/recência. As prioridades analíticas anteriores permanecem futuras. Ver compilador/README.md.

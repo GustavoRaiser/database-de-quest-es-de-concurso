@@ -14,4 +14,4 @@ O arquivo `HASH.json` contém o resultado, sem o campo resultado_id da resposta 
 
 `digitalizador/pipeline.py` orquestra as CLIs públicas: recepção do Captador, reserva de identidade pelo Organizador, preparação/entrega do Captador, extração e incorporação pelo Organizador. O Digitalizador não grava diretamente no acervo. O adaptador GitHub chama o mesmo pipeline. Ver [OPERACAO.md](OPERACAO.md).
 
-Descritores são regras locais do Organizador, sem modelos. Não comprovam equivalência semântica. Compilador, agrupamentos, scores e análise de apostilas não integram este contrato.
+Descritores são regras locais do Organizador, sem modelos. Não comprovam equivalência semântica. O Compilador recebe o acervo pelo snapshot público do Organizador após a incorporação, não o JSON intermediário diretamente. Seu contrato de scores/grupos lexicais é separado; análise de apostilas permanece futura.

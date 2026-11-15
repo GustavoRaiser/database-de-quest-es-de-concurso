@@ -6,7 +6,7 @@ import sys
 import subprocess
 
 from .core import Base, Erro, ler_json
-from .emissao import emitir, FILTROS
+from .emissao import emitir, exportar, FILTROS
 from .abordagem import preparar, registrar
 
 
@@ -31,8 +31,10 @@ def main():
     registrar_abordagens.add_argument('arquivo')
     registrar_abordagens.add_argument('--substituir', action='store_true')
     emissao = sub.add_parser("emitir")
+    exportacao = sub.add_parser('exportar', help='snapshot completo e verificado para consumidores')
     for campo in FILTROS:
         emissao.add_argument("--" + campo, default="")
+        exportacao.add_argument('--'+campo, default='')
     emissao.add_argument("--pagina", type=int, default=1)
     emissao.add_argument("--por-pagina", type=int, default=20)
     consultar = sub.add_parser("consultar")
@@ -83,6 +85,8 @@ def main():
             resultado = registrar(base, args.tema, ler_json(args.arquivo), args.substituir)
         elif args.comando == "emitir":
             resultado = emitir(base, {campo: getattr(args, campo) for campo in FILTROS}, args.pagina, args.por_pagina)
+        elif args.comando == 'exportar':
+            resultado = exportar(base, {campo:getattr(args,campo) for campo in FILTROS})
         elif args.comando == "consultar":
             resultado = base.consultar(args.id)
         elif args.comando == "guardar-recurso":

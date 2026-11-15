@@ -19,6 +19,7 @@ As instruções deste arquivo se aplicam ao repositório inteiro. AGENTS.md loca
 - emissor/: interface compartilhada de consulta e captação; delega a recepção ao Captador e não modifica o acervo definitivo.
 - captador/: recepção de originais, lotes, vínculos de gabaritos e procedência; não extrai questões.
 - digitalizador/: extração de conteúdo de fontes, reconstrução de layout, OCR, preparação de texto/HTML e relatórios de extração.
+- compilador/: comparação de questões, scores e grupos propostos em artefatos próprios; não altera o acervo.
 - Raiz: apenas navegação, arquitetura, contratos e configurações realmente globais. Não colocar ferramentas de um agente na raiz.
 - Código, testes, dependências, exemplos e instruções específicos pertencem à pasta do respectivo agente.
 - Não copiar ferramentas de outro módulo para contornar a interface. Não acessar funções privadas ou importar diretamente seu código interno como atalho de integração.
@@ -68,3 +69,5 @@ Ao receber URLs de provas para processamento, usar `python digitalizador/pipelin
 Executar no ambiente receptor: GitHub Actions para captação no GitHub, CLI local para desktop. Originais e base ficam nesse ambiente; transferência/continuação de artefatos é explícita. Não publicar PDFs/base real no Git automaticamente. A cópia do acervo no artefato do workflow é o resultado do processamento no GitHub, com retenção documentada. Não existe serviço permanente rodando apenas pela existência do repositório.
 
 Incorporação é responsabilidade exclusiva do Organizador via CLI pública. IDs por linha são preservados; mesmo PDF no mesmo órgão/cargo não duplica questões. Não remover marcadores ou arquivos de transação pendente para liberar leitura: usar recuperar. Tema Não classificado e descritores propostos não equivalem a classificação semântica confirmada.
+
+O Compilador é executado após a incorporação pelo pipeline, via sua CLI pública. Ler [compilador/AGENTS.md](compilador/AGENTS.md). Scores iniciais são lexicais; preservar cobertura, avisos e pares não comparados. Grupos não são categorias nem confirmação semântica e não autorizam mover ou fundir questões.

@@ -67,7 +67,7 @@ preparar-abordagem retorna tarefa v1 com conteúdo completo, apoios, recursos, c
 
 ## 10. Operação atual sem IA
 
-A implementação vigente é executada por programas no host. Descoberta/download no Captador, entrega completa e validada, extração ENAM/FGV Tipo 1 no Digitalizador e descritores por regras no Organizador. O contrato intermediário v2 está em digitalizador/CONTRATO.md. A interface consome as CLIs públicas e apresenta a extração via POST /api/digitalizacao/processar. O pipeline CLI chama a incorporação definitiva do Organizador; agrupamento não implementado. Os modos históricos de tarefas para IA/harness não são dependências da operação atual.
+A implementação vigente é executada por programas no host. Descoberta/download no Captador, entrega completa e validada, extração ENAM/FGV Tipo 1 no Digitalizador e descritores por regras no Organizador. O contrato intermediário v2 está em digitalizador/CONTRATO.md. A interface consome as CLIs públicas e apresenta a extração via POST /api/digitalizacao/processar. O pipeline CLI chama a incorporação definitiva do Organizador e depois o Compilador, que propõe relações/grupos lexicais. Os modos históricos de tarefas para IA/harness não são dependências da operação atual.
 
 ## 11. Recepção em lote e operação portátil
 
@@ -78,3 +78,11 @@ A implementação vigente é executada por programas no host. Descoberta/downloa
 `digitalizador/pipeline.py` chama CLIs públicas de cada agente e produz relatório por reserva; segue processando outros itens quando um deles fica pendente. Só o Organizador escreve dados/. `incorporar-extracao` recebe resultado, captacoes e situacao_inicial por JSON stdin. Confere resultado v2 e entrega atual, preserva PDFs/recursos, cria ficha em provas/ORGAO/CARGO/SHA_PROVA.json e retorna mapeamento. Mesmo PDF no mesmo órgão/cargo é idempotente; gabarito diferente bloqueia atualização automática. A ficha é o vínculo durável; protocolo do Captador é local ao ambiente, não chave global entre computadores.
 
 O workflow executa a mesma cadeia em runner do GitHub; preserva tudo em artefato, sem commit automático. Desktop guarda localmente. Continuar artefato anterior é explícito. Não há chamadas a modelos ou sincronização implícita entre os ambientes. Ver digitalizador/OPERACAO.md.
+
+## 12. Organizador → Compilador → consumidores
+
+A CLI pública exportar recebe os mesmos filtros de emitir e retorna um snapshot v1 completo de questões, metadados/classificação e fichas de prova, sem paginação. O Organizador valida o conjunto, verifica marcador/revisão de publicação e calcula corpus_sha256. Contrato da serialização canônica e resultados em compilador/CONTRATO.md. O Compilador chama a CLI por subprocesso, sem importar código interno.
+
+O Compilador preserva IDs/ocorrências e escreve somente artefatos derivados. analisar gera scores por par e grupos propostos; comparar e similares oferecem consulta por ID; consultar lê resultado arquivado por hash. Nenhuma relação lexical altera o tema ou confirma equivalência semântica. Não identificado/indeterminado não é coincidência positiva. Grupos não aplicam transitividade.
+
+O pipeline chama analisar uma vez após as incorporações bem-sucedidas do pedido, sobre todo o acervo, com saída definida por --compilacoes. Falha dessa etapa é registrada separadamente e não desfaz as incorporações já validadas; torna a execução incompleta. No GitHub, compilador/ acompanha o artefato acervo-processado. Emissor ainda não apresenta os grupos na interface visual.

@@ -11,6 +11,7 @@ O objetivo é permitir que uma IA em CLI/harness compare os PDFs de estudo do us
 | [captador/](captador/README.md) | Captador | Recebe originais, organiza lotes e associa gabaritos | Implementado com interface no Emissor |
 | [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI, incorporação transacional de extrações e testes implementados |
 | [emissor/](emissor/README.md) | Emissor | Visualização com filtros e API JSON para ferramentas próprias | Implementado |
+| [compilador/](compilador/README.md) | Compilador | Compara questões e propõe relações e grupos com score e evidências | CLI lexical, índice de candidatas e integração no pipeline implementados |
 | [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | ENAM/FGV Tipo 1; pipeline desktop/harness e GitHub Actions |
 
 ## Estrutura
@@ -48,6 +49,15 @@ digitalizador/
     AGENTS.md
     README.md
     PLANEJAMENTO.md
+compilador/
+    AGENTS.md
+    README.md
+    CONTRATO.md
+    PLANEJAMENTO.md
+    app.py
+    motor.py
+    criterios.json
+    tests/
 ```
 
 Dentro de cada base, a estrutura continua sendo:
@@ -111,3 +121,7 @@ Em Adicionar material: localizar links ou enviar PDFs, identificar o lote, receb
 ## Execução no GitHub ou no desktop
 
 Ver [operação portátil](digitalizador/OPERACAO.md). No PC, uma pasta com pares `NOME_cad.pdf` e `NOME_gab.pdf` ou uma URL inicia a cadeia. No GitHub, **Actions → Captar e digitalizar provas → Run workflow** recebe a URL/pasta e disponibiliza a base, originais e relatórios no artefato `acervo-processado` (30 dias). O processamento inteiro ocorre naquele ambiente. Continuação de artefato anterior é explícita; não existe sincronização automática entre GitHub e PC. Perfil de extração atual: ENAM/FGV Tipo 1, PDF textual.
+
+## Compilar relações entre questões
+
+O [Compilador](compilador/README.md) tem código próprio e roda ao final das incorporações do pipeline. Também pode executar separadamente: `python compilador/app.py --base organizador analisar`. Compara os quatro critérios por indicadores lexicais, registra score/cobertura/evidências e propõe grupos conservadores, preservando IDs e origens. Para consultar um par: `python compilador/app.py --base organizador/exemplos/base comparar N32.a2.5.y.1 N32.a2.5.y.2`. Não há chamadas a modelos. Grupos não são classificação temática confirmada; a interface visual ainda não os exibe.

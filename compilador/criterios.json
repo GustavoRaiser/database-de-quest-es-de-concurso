@@ -1,0 +1,10 @@
+{
+  "versao": 1,
+  "pesos": {"conteudo": 0.4, "recorte": 0.3, "raciocinio": 0.2, "estrutura_redacao": 0.1},
+  "max_postagem": 200,
+  "termos_busca": 40,
+  "vizinhos": 30,
+  "limiar": 60,
+  "limiar_grupo": 80,
+  "cobertura_minima": 0.75
+}

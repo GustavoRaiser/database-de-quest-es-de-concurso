@@ -16,7 +16,7 @@ def cli(cmd, dados=None, cwd=None):
     return json.loads(p.stdout)
 
 
-def executar(entrada, captacoes, saida, base):
+def executar(entrada, captacoes, saida, base, compilacoes=None):
     captacoes,saida,base = (Path(p).resolve() for p in (captacoes,saida,base))
     def cap(acao,dados):
         return cli([sys.executable,str(ROOT/'captador/app.py'),'--raiz',str(captacoes),acao],dados)
@@ -57,10 +57,20 @@ def executar(entrada, captacoes, saida, base):
     contagens = {}
     for r in resultados:
         contagens[r['estado']] = contagens.get(r['estado'],0)+1
+    compilacao={'estado':'nao_executada'}
+    if any(r['estado'] in ('incorporado','ja_incorporado') for r in resultados):
+        try:
+            pasta_compilador=Path(compilacoes or ROOT/'compilador/trabalho').resolve()
+            c=cli([sys.executable,str(ROOT/'compilador/app.py'),'--base',str(base),
+                   '--saida',str(pasta_compilador),'analisar'])
+            compilacao={'estado':'compilado','id':c['id'],'arquivo':c['arquivo'],
+                        'corpus_sha256':c['corpus_sha256'],'diagnostico':c['diagnostico']}
+        except (ValueError,OSError,subprocess.SubprocessError) as exc:
+            compilacao={'estado':'falha','erro':str(exc)}
     return {'versao':1,'ambiente':'execução local ao processo; sem chamadas a modelos',
             'captacoes':str(captacoes),'base':str(base),'resultados':resultados,
-            'contagens':contagens,'erros_recepcao':recebidos['erros'],
-            'completo':bool(resultados) and not recebidos['erros'] and all(r['estado'] in ('incorporado','ja_incorporado') for r in resultados)}
+            'contagens':contagens,'erros_recepcao':recebidos['erros'],'compilacao':compilacao,
+            'completo':bool(resultados) and not recebidos['erros'] and compilacao['estado']=='compilado' and all(r['estado'] in ('incorporado','ja_incorporado') for r in resultados)}
 
 
 def main():
@@ -74,6 +84,7 @@ def main():
     p.add_argument('--saida',type=Path,default=ROOT/'digitalizador/trabalho')
     p.add_argument('--base',type=Path,default=ROOT/'organizador')
     p.add_argument('--relatorio',type=Path,default=ROOT/'digitalizador/trabalho/pipeline.json')
+    p.add_argument('--compilacoes',type=Path,default=ROOT/'compilador/trabalho')
     args = p.parse_args()
     try:
         entrada = json.loads(args.pedido.read_text(encoding='utf-8')) if args.pedido else {}
@@ -83,7 +94,7 @@ def main():
         if args.situacao_inicial is not None: entrada['situacao_inicial'] = args.situacao_inicial
         if not any(entrada.get(k) for k in ('urls','pasta','prova_url','gabarito_url')):
             raise ValueError('Informar --url, --pasta ou --pedido')
-        r = executar(entrada,args.captacoes,args.saida,args.base)
+        r = executar(entrada,args.captacoes,args.saida,args.base,args.compilacoes)
         args.relatorio.parent.mkdir(parents=True,exist_ok=True)
         args.relatorio.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
         print(json.dumps(r,ensure_ascii=False,indent=2))

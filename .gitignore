@@ -4,6 +4,8 @@ __pycache__/
 *.tmp
 /captador/trabalho/
 /digitalizador/trabalho/
+/compilador/trabalho/
+.compilador.lock
 /organizador/trabalho/
 /captador/entrada/*.pdf
 .transacoes/

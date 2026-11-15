@@ -8,6 +8,7 @@ URLs de páginas / par NOME_cad.pdf + NOME_gab.pdf
     ↓ Captador: identificar lote, vincular o par e liberar entrega íntegra
     ↓ Digitalizador: extrair perfil suportado, respostas e páginas originais
     ↓ Organizador: validar, cadastrar hierarquia, anexar linhas e metadados
+    ↓ Compilador: relações e grupos propostos por indícios lexicais
     ↓ Emissor / CLI / ferramentas próprias: consultar a base resultante
 ```
 
@@ -35,6 +36,7 @@ Opções de localização independentes do diretório atual:
 - `--captacoes`: trabalho do Captador; padrão `captador/trabalho`.
 - `--saida`: resultados e páginas do Digitalizador; padrão `digitalizador/trabalho`.
 - `--base`: acervo do Organizador; padrão `organizador`.
+- `--compilacoes`: trabalho do Compilador; padrão `compilador/trabalho`.
 - `--relatorio`: resumo da execução; padrão `digitalizador/trabalho/pipeline.json`.
 
 Para uma URL direta de prova, informar também a URL do gabarito no pedido. Exemplo de `pedido.json` (nomes e códigos de órgão/cargo podem ser personalizados; IDs ausentes são reservados pelo Organizador):
@@ -70,6 +72,7 @@ O workflow publica `acervo-processado`, com:
 base/                 # acervo completo consultável; dados, metadados e fontes
 captador/             # reservas, originais, protocolos e encaminhamentos
 digitalizador/       # resultados intermediários e PNGs das páginas
+compilador/           # relações/grupos propostos do acervo
 relatorio.json        # incorporado, já incorporado, incompleto ou pendente
 pedido.json           # parâmetros usados
 ```
@@ -82,7 +85,7 @@ Os campos do workflow são dados em variáveis de ambiente, sem interpolação e
 
 - Perfil atual: ENAM/FGV Tipo 1, PDF textual, 80 questões com A–E e layout de gabarito reconhecido. Outros formatos são reservados e apresentados como pendentes quando não extraíveis.
 - Originais PDF são copiados ao acervo por hash. Páginas com elementos visuais/vetoriais são preservadas integralmente em PNG para conferência; a posição exata de figuras dentro do texto ainda não é reconstruída.
-- Disciplina vem do cabeçalho. Tema automático é **Não classificado**. Descritores por regras são propostas lexicais; classificação semântica e Compilador permanecem futuros.
+- Disciplina vem do cabeçalho. Tema automático é **Não classificado**. Descritores por regras são propostas lexicais; classificação semântica permanece futura. O Compilador já registra semelhanças lexicais propostas.
 - Falha de numeração, alternativas ou gabarito impede a incorporação. Complementos/retificações não interpretados também bloqueiam. Avisos sobre classificação e apresentação visual são preservados, sem declarar completude semântica.
 - Repetir o mesmo PDF no mesmo órgão/cargo retorna o mapeamento existente, sem acrescentar questões. Outro gabarito para a mesma prova exige tratamento específico de versão; não sobrescreve respostas automaticamente.
 - O código de saída é 0 para todas as reservas incorporadas/já existentes; 2 para execução parcial/pendências; 1 para erro de invocação. No Actions, pendências deixam a etapa com falha, mas o artefato é enviado mesmo assim.
@@ -93,3 +96,5 @@ Os campos do workflow são dados em variáveis de ambiente, sem interpolação e
 O Organizador prepara e valida a base proposta antes de publicar. `.transacao-pendente.json` bloqueia consultas durante publicação parcial; `python -m basequestoes --base CAMINHO recuperar`, executado de `organizador/`, retoma os arquivos preservando os hashes esperados. Se o processo morreu e deixou `.base.lock`, confirmar que não existe mais um escritor antes de retirar apenas esse bloqueio. Não apagar o marcador nem `.transacoes/` para tentar liberar a base. Recuperação recusa sobrescrever alterações externas conflitantes.
 
 Arquivos de trabalho são ignorados pelo Git. O funcionamento offline exige apenas PDFs locais e dependências já instaladas; uma URL naturalmente exige conexão no ambiente que executa o Captador.
+
+O pipeline executa o [Compilador](../compilador/README.md) uma vez após as incorporações do pedido, sobre toda a base. Resultados lexicais são derivados e preservam as ocorrências. Falha na compilação deixa as questões incorporadas e aparece em compilacao no relatório; é possível recompilar sem novos downloads.

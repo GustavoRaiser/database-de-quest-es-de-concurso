@@ -79,7 +79,7 @@ O hash inclui enunciado, assertivas, textos de apoio e descritores dos recursos,
 
 Os perfis oferecem conteúdo exigido, recorte, raciocínio e estrutura para buscar candidatas. O texto completo continua sendo a evidência final para comparar pares. Pendências precisam acompanhar o consumo; não transformar uma descrição incerta em equivalência confirmada. A ausência de perfil não significa ausência de assunto.
 
-Agrupamento, embeddings, score, comparação entre pares e propagação de similaridade ainda não estão implementados. O critério 1 também não gera automaticamente disciplina/tema nem move questões. Essa etapa não exige revisão jurídica obrigatória e não determina resposta correta.
+Comparação e score lexicais e agrupamento conservador estão implementados no Compilador. Embeddings e equivalência semântica continuam fora da operação; não há propagação transitiva de similaridade. O critério 1 também não gera automaticamente disciplina/tema nem move questões. Essa etapa não exige revisão jurídica obrigatória e não determina resposta correta.
 
 ## Exibição e avaliação de PDF
 

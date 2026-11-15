@@ -43,7 +43,7 @@ Não há IA nesta operação. Os descritores são produzidos pela CLI pública d
 - Páginas com imagens/vetores são preservadas integralmente como PNG e no PDF original; posicionamento de figuras dentro do texto não é reconstruído.
 - Gabaritos de outros tipos não são misturados ao Tipo 1. Anulação depende da legenda reconhecida.
 - Retificações/complementos são preservados, mas ainda exigem interpretação separada.
-- Temas sem confirmação ficam em Não classificado. Score de semelhança, agrupamentos e processamento de apostilas continuam futuros.
+- Temas sem confirmação ficam em Não classificado. O Compilador já propõe scores/grupos lexicais; análise semântica e processamento de apostilas continuam futuros.
 - A interface usa extraido_com_pendencias; não presume completude semântica nem atualidade jurídica.
 
 ## Verificar

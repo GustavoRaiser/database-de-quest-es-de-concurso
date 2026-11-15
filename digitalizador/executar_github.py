@@ -35,7 +35,8 @@ def main():
     arquivo.write_text(json.dumps(pedido,ensure_ascii=False),encoding='utf-8')
     cmd = [sys.executable,str(ROOT/'digitalizador/pipeline.py'),'--pedido',str(arquivo),
            '--captacoes',str(trabalho/'captador'),'--saida',str(trabalho/'digitalizador'),
-           '--base',str(base),'--relatorio',str(trabalho/'relatorio.json')]
+           '--base',str(base),'--relatorio',str(trabalho/'relatorio.json'),
+           '--compilacoes',str(trabalho/'compilador')]
     resultado = subprocess.run(cmd)
     resumo = Path(os.environ['GITHUB_STEP_SUMMARY']) if os.environ.get('GITHUB_STEP_SUMMARY') else None
     if resumo and (trabalho/'relatorio.json').exists():

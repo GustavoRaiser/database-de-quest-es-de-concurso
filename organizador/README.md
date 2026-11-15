@@ -108,3 +108,7 @@ Os comandos descrever-questao e descrever-candidatos geram descritores por regra
 ## Inclusão automática de extrações
 
 Implementados `reservar-identidade`, `incorporar-extracao` e `recuperar`, além das operações descritas acima. Ver [contrato de incorporação](INCORPORACAO.md). O [pipeline portátil](../digitalizador/OPERACAO.md) fornece as entradas e percorre o fluxo; a gravação pertence ao Organizador. O índice continua restrito a temas; IDs existentes e bytes das linhas anteriores são preservados.
+
+## Exportação para o Compilador
+
+`python -m basequestoes --base CAMINHO exportar` retorna snapshot público v1, com os mesmos filtros opcionais de emitir e sem paginação: itens, metadados/classificação, fichas de prova e hash do corpus. Não altera a base. O [Compilador](../compilador/README.md) consome essa interface para seus artefatos derivados.
