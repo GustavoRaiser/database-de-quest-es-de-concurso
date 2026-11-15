@@ -153,4 +153,12 @@ class IntegracaoTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'fora da base'):app.compilar(self.base,self.base/'compilador',CONFIG)
 
 
+
+class CamposRegressaoTest(unittest.TestCase):
+    def test_apoio_nao_e_comparado_com_assertiva(self):
+        texto='Texto compartilhado apenas em campos de funções diferentes.'
+        m=motor([item(1,'Enunciado igual.', ['Primeira alternativa.'],{'textos_apoio':[texto]}),
+                 item(2,'Enunciado igual.', ['Primeira alternativa.',texto])])
+        self.assertEqual(m.comparar(0,1)['dimensoes']['estrutura_redacao'],50)
+
 if __name__=='__main__':unittest.main()

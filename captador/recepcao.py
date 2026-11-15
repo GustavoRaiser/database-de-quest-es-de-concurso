@@ -85,12 +85,19 @@ def reservar(c, titulo, fontes, canal):
 
 def receber(c, dados):
     resultados, erros = [], []
+    def receber_par(titulo,fontes,canal):
+        try:
+            reserva=reservar(c,titulo,fontes,canal)
+            if not any(r['id']==reserva['id'] for r in resultados):
+                resultados.append(reserva)
+        except (ValueError,OSError,KeyError,TypeError) as exc:
+            erros.append({'titulo':titulo,'erro':str(exc)})
     with c.bloqueio():
         urls = dados.get('urls',[])
         exigir(isinstance(urls,list) and len(urls)<=50 and all(isinstance(u,str) for u in urls), 'Informar até 50 URLs')
         if dados.get('prova_url') or dados.get('gabarito_url'):
             fontes = {k:dados[k+'_url'] for k in ('prova','gabarito') if dados.get(k+'_url')}
-            resultados.append(reservar(c,dados.get('titulo','PDF recebido'),fontes,'url'))
+            receber_par(dados.get('titulo','PDF recebido'),fontes,'url')
         grupos, paginas = {}, []
         for url in urls:
             u = urlsplit(url)
@@ -106,17 +113,17 @@ def receber(c, dados):
                 paginas.append(url)
         for fontes in grupos.values():
             titulo = Path(urlsplit(fontes.get('prova') or fontes['gabarito']).path).name
-            resultados.append(reservar(c,titulo,fontes,'url'))
+            receber_par(titulo,fontes,'url')
         for url in paginas:
             try:
                 d = descobrir(url)
                 if d['pdf_direto']:
-                    resultados.append(reservar(c,Path(urlsplit(url).path).name,{'prova':url},'url'))
+                    receber_par(Path(urlsplit(url).path).name,{'prova':url},'url')
                 else:
                     exigir(d['candidatos'],'Nenhum link rotulado de prova/gabarito encontrado')
                     for candidato in d['candidatos']:
                         fontes = {k:candidato[k+'_url'] for k in ('prova','gabarito') if candidato.get(k+'_url')}
-                        resultados.append(reservar(c,candidato['titulo'],fontes,'url'))
+                        receber_par(candidato['titulo'],fontes,'url')
             except (ValueError,OSError) as exc:
                 erros.append({'url':url,'erro':str(exc)})
         if dados.get('pasta'):
@@ -133,10 +140,7 @@ def receber(c, dados):
                     exigir(tipo not in par,'Nomes ambíguos para o mesmo par')
                     par[tipo] = p
             for titulo,fontes in pares.items():
-                try:
-                    resultados.append(reservar(c,titulo,fontes,'pasta'))
-                except (ValueError,OSError) as exc:
-                    erros.append({'titulo':titulo,'erro':str(exc)})
+                receber_par(titulo,fontes,'pasta')
     return {'reservas':resultados,'erros':erros,'escopo':'links da página informada; sem percorrer outras páginas'}
 
 

@@ -125,3 +125,7 @@ Ver [operação portátil](digitalizador/OPERACAO.md). No PC, uma pasta com pare
 ## Compilar relações entre questões
 
 O [Compilador](compilador/README.md) tem código próprio e roda ao final das incorporações do pipeline. Também pode executar separadamente: `python compilador/app.py --base organizador analisar`. Compara os quatro critérios por indicadores lexicais, registra score/cobertura/evidências e propõe grupos conservadores, preservando IDs e origens. Para consultar um par: `python compilador/app.py --base organizador/exemplos/base comparar N32.a2.5.y.1 N32.a2.5.y.2`. Não há chamadas a modelos. Grupos não são classificação temática confirmada; a interface visual ainda não os exibe.
+
+## Revisão e testes automáticos
+
+A [revisão geral de integração](REVISAO.md) registra cobertura, correções e pendências atuais. O workflow Testes de integração executa as cinco suítes e valida as bases em pushes para main e pull requests, em Linux e Windows. A execução local verificada é descrita no relatório; a matriz remota tem resultados próprios no Actions.

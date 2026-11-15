@@ -72,7 +72,7 @@ def compilar(base,saida,config,filtros=None,exaustivo=False):
     snapshot=exportar(base,filtros)
     motor=Motor(snapshot,config)
     implementacao=digest({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (Path(__file__),Path(__file__).with_name('motor.py'))})
-    resultado={'versao':1,'algoritmo':'lexical/1','implementacao_sha256':implementacao,
+    resultado={'versao':1,'algoritmo':'lexical/2','implementacao_sha256':implementacao,
         'corpus_sha256':snapshot['corpus_sha256'],'configuracao':config,'criterios_sha256':digest(config),
         'filtros':{k:v for k,v in filtros.items() if v},'estado':'proposta_lexical',
         'limitacoes':['Os quatro critérios usam indicadores lexicais; score não é probabilidade nem equivalência semântica.',

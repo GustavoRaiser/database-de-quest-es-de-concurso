@@ -98,3 +98,7 @@ O Organizador prepara e valida a base proposta antes de publicar. `.transacao-pe
 Arquivos de trabalho são ignorados pelo Git. O funcionamento offline exige apenas PDFs locais e dependências já instaladas; uma URL naturalmente exige conexão no ambiente que executa o Captador.
 
 O pipeline executa o [Compilador](../compilador/README.md) uma vez após as incorporações do pedido, sobre toda a base. Resultados lexicais são derivados e preservam as ocorrências. Falha na compilação deixa as questões incorporadas e aparece em compilacao no relatório; é possível recompilar sem novos downloads.
+
+## Relatórios de execução
+
+O pipeline publica o relatório por substituição atômica. Ao iniciar, marca em_execucao; erros de pedido/recepção geram estado falha e completo false, substituindo eventual relatório anterior. O adaptador GitHub também marca preparando antes de ler as entradas e registra falhas de preparação. Interrupções abruptas podem deixar estado intermediário, que nunca significa sucesso. A criação inicial da cópia da base no runner ocorre em pasta temporária, publicada somente depois de copiada.

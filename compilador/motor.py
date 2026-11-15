@@ -98,7 +98,10 @@ class Motor:
             if normalizar(razao) in INDETERMINADOS:razao=None
             self.docs.append({'seqs':seqs,'termos':Counter(relevantes),
                 'frases':Counter(p for s in seqs for p in sorted(shingles(s))),
-                'redacao':[shingles(s,3) for s in seqs], 'conceitos':conceitos,'raciocinio':razao,
+                'redacao':{('enunciado',0):shingles(tokens(q[1]),3),
+                           **{('assertiva',i):shingles(tokens(t),3) for i,t in enumerate(q[2])},
+                           **{('apoio',i):shingles(tokens(t),3) for i,t in enumerate(m.get('textos_apoio',[]))}},
+                'conceitos':conceitos,'raciocinio':razao,
                 'conteudo_declarado':texto_perfil(perfil,'conteudo_exigido',declarado),
                 'recorte_declarado':texto_perfil(perfil,'recorte_especifico',declarado),
                 'igualdade':digest(seqs),'perfil':perfil,'visuais':bool(m.get('recursos')),
@@ -148,9 +151,10 @@ class Motor:
         recorte=cos(self.recortes[i],self.recortes[j])
         if recorte is not None:metricas['recorte']=recorte
         # Enunciado e alternativas em sua ordem. Apoios também participam da comparação textual.
-        redacoes=[jaccard(x,y) for x,y in zip(a['redacao'],b['redacao'])]
+        campos=sorted(a['redacao'].keys() | b['redacao'].keys())
+        redacoes=[jaccard(a['redacao'].get(k,set()),b['redacao'].get(k,set())) for k in campos]
         redacoes=[v for v in redacoes if v is not None]
-        metricas['estrutura_redacao']=(sum(redacoes)/max(len(a['redacao']),len(b['redacao'])) if redacoes else None)
+        metricas['estrutura_redacao']=(sum(redacoes)/len(campos) if redacoes else None)
         cobertura=sum(self.config['pesos'][k] for k,v in metricas.items() if v is not None)
         score=100*sum(self.config['pesos'][k]*v for k,v in metricas.items() if v is not None)/cobertura if cobertura else 0
         avisos=['Semelhança lexical não confirma que as questões exigem o mesmo conhecimento.']

@@ -9,16 +9,20 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def main():
+def executar():
     trabalho = ROOT/'digitalizador/trabalho/github'
     trabalho.mkdir(parents=True,exist_ok=True)
+    from pipeline import gravar_relatorio
+    gravar_relatorio(trabalho/'relatorio.json',{'versao':1,'estado':'preparando','completo':False})
     base = trabalho/'base'
     if not base.exists():
-        base.mkdir()
+        import tempfile
+        temporario=Path(tempfile.mkdtemp(prefix='.base-',dir=trabalho))
         for nome in ('manifesto.json','catalogos.json','indice.json','dados','recursos','importacoes','provas'):
             src = ROOT/'organizador'/nome
-            if src.is_dir():shutil.copytree(src,base/nome)
-            elif src.is_file():shutil.copyfile(src,base/nome)
+            if src.is_dir():shutil.copytree(src,temporario/nome)
+            elif src.is_file():shutil.copyfile(src,temporario/nome)
+        os.replace(temporario,base)
     pedido = {'identificacao':json.loads(os.environ.get('IDENTIFICACAO','') or '{}'),
               'situacao_inicial':int(os.environ.get('SITUACAO_INICIAL','0'))}
     url = os.environ.get('FONTE_URL','').strip()
@@ -44,8 +48,19 @@ def main():
         with resumo.open('a',encoding='utf-8') as f:
             f.write('## Captação e digitalização\n\n')
             f.write('Resultado disponível no artefato **acervo-processado**.\n\n')
-            f.write('```json\n'+json.dumps({'contagens':r['contagens'],'completo':r['completo']},ensure_ascii=False,indent=2)+'\n```\n')
+            f.write('```json\n'+json.dumps({'contagens':r.get('contagens',{}), 'erro':r.get('erro'),'completo':r['completo']},ensure_ascii=False,indent=2)+'\n```\n')
     return resultado.returncode
+
+
+def main():
+    try:
+        return executar()
+    except (ValueError,OSError,TypeError,subprocess.SubprocessError) as exc:
+        from pipeline import gravar_relatorio
+        gravar_relatorio(ROOT/'digitalizador/trabalho/github/relatorio.json',
+                        {'versao':1,'estado':'falha','completo':False,'erro':str(exc)})
+        print('Erro: '+str(exc),file=sys.stderr)
+        return 1
 
 
 if __name__=='__main__':sys.exit(main())

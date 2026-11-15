@@ -6,7 +6,7 @@ Consumir a CLI pública exportar do Organizador. Snapshot v1: manifesto, itens, 
 
 Cada item tem id, questao ([situacao,enunciado,assertivas]), metadados opcionais e classificacao. Fichas de prova são um mapa por caminho relativo. ID continua sendo órgão.cargo.disciplina.tema.linha. Não confundir com protocolo órgão.cargo.prova ou com número original.
 
-## Comparação lexical/1
+## Comparação lexical/2
 
 Normalizar caixa e acentos; tokenizar letras/números. Não reordenar enunciados, assertivas ou apoios. Conteúdo usa termos não triviais, removendo a lista fixa de palavras comuns de motor.py; recorte usa bigramas por campo; redação usa trigramas por campo. Campos curtos usam seus próprios tokens. Frequência dos bigramas conta presença por campo, não quantas vezes a expressão se repete dentro de um mesmo campo.
 
@@ -16,7 +16,7 @@ Conteúdo: cosseno dos termos; quando ambos têm conceitos reconhecidos, combina
 
 Recorte: cosseno dos bigramas; se ambos oferecem recorte em perfil declarado humano/IA sem pendências, usar o cosseno dos termos desses recortes. Textos genéricos gerados por regras não são usados como declaração semântica. Marcadores Não identificado/Não determinado são tratados como ausentes.
 
-Raciocínio: 1 para rótulos conhecidos iguais, 0 para rótulos conhecidos diferentes, nulo se um deles é indeterminado/outro/ausente. Estrutura/redação: Jaccard dos trigramas dos campos correspondentes; soma dividida pelo maior número de campos, penalizando diferença de quantidade. Conteúdo vazio de ambos não constitui evidência positiva.
+Raciocínio: 1 para rótulos conhecidos iguais, 0 para rótulos conhecidos diferentes, nulo se um deles é indeterminado/outro/ausente. Estrutura/redação: Jaccard dos trigramas dos campos correspondentes; soma dividida pela união das posições por tipo de campo, penalizando diferença de quantidade. Enunciados, assertivas e apoios são comparados apenas com o mesmo tipo/posição; um apoio nunca ocupa o lugar de uma assertiva. Resultados lexical/1 permanecem arquivados; recompilar usa lexical/2. Conteúdo vazio de ambos não constitui evidência positiva.
 
 Score = 100 × soma(peso × indicador disponível) / soma(pesos disponíveis). Cobertura = soma dos pesos disponíveis; não é confiança semântica. Indicadores por dimensão são expostos em 0–100 ou null; score arredondado a quatro casas. Avisos de perfis propostos, recursos não interpretados e diferenças de negação permanecem no par. A semelhança é lexical mesmo quando usa textos declarados por humanos: não interpreta seu significado.
 

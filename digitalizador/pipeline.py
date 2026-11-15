@@ -4,6 +4,22 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import os
+import tempfile
+from datetime import datetime, timezone
+
+
+def gravar_relatorio(path, dados):
+    path=Path(path)
+    path.parent.mkdir(parents=True,exist_ok=True)
+    fd,tmp=tempfile.mkstemp(dir=path.parent,suffix='.tmp')
+    try:
+        with os.fdopen(fd,'w',encoding='utf-8') as f:
+            json.dump(dados,f,ensure_ascii=False,indent=2)
+            f.write('\n');f.flush();os.fsync(f.fileno())
+        os.replace(tmp,path)
+    finally:
+        if os.path.exists(tmp):os.unlink(tmp)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -87,7 +103,11 @@ def main():
     p.add_argument('--compilacoes',type=Path,default=ROOT/'compilador/trabalho')
     args = p.parse_args()
     try:
+        gravar_relatorio(args.relatorio,{'versao':1,'estado':'em_execucao','completo':False,
+                                        'iniciado_em':datetime.now(timezone.utc).isoformat()})
         entrada = json.loads(args.pedido.read_text(encoding='utf-8')) if args.pedido else {}
+        if not isinstance(entrada,dict):raise ValueError('Pedido deve ser objeto JSON')
+        if not isinstance(entrada.get('identificacao',{}),dict):raise ValueError('Identificação deve ser objeto JSON')
         if args.url: entrada['urls'] = args.url
         if args.pasta: entrada['pasta'] = str(args.pasta.resolve())
         if args.situacao_gabarito: entrada['situacao_gabarito'] = args.situacao_gabarito
@@ -95,11 +115,14 @@ def main():
         if not any(entrada.get(k) for k in ('urls','pasta','prova_url','gabarito_url')):
             raise ValueError('Informar --url, --pasta ou --pedido')
         r = executar(entrada,args.captacoes,args.saida,args.base,args.compilacoes)
-        args.relatorio.parent.mkdir(parents=True,exist_ok=True)
-        args.relatorio.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+        gravar_relatorio(args.relatorio,r)
         print(json.dumps(r,ensure_ascii=False,indent=2))
         return 0 if r['completo'] else 2
     except (ValueError,OSError,subprocess.SubprocessError) as exc:
+        try:
+            gravar_relatorio(args.relatorio,{'versao':1,'estado':'falha','completo':False,'erro':str(exc)})
+        except OSError:
+            pass
         print('Erro: '+str(exc),file=sys.stderr)
         return 1
 

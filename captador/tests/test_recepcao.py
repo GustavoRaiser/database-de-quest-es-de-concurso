@@ -58,4 +58,29 @@ class RecepcaoTest(unittest.TestCase):
             self.assertEqual(c.estado()['lotes'],[])
 
 
+
+class RecepcaoRegressaoTest(unittest.TestCase):
+    def test_reserva_corrompida_nao_interrompe_outros_pares(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            c=Captador(tmp)
+            candidatos=[{'titulo':f'Prova {n}','prova_url':f'https://exemplo.org/{n}_cad.pdf',
+                         'gabarito_url':f'https://exemplo.org/{n}_gab.pdf'} for n in (1,2)]
+            def obter(url):return b'%PDF-1.4 '+url.encode(),{}
+            with patch.object(recepcao,'descobrir',return_value={'pdf_direto':False,'candidatos':candidatos}),patch.object(recepcao,'obter',side_effect=obter):
+                primeiro=recepcao.receber(c,{'urls':['https://exemplo.org/provas']})
+                r=primeiro['reservas'][0]
+                (Path(tmp)/'reservados'/r['id']/r['documentos']['prova']['arquivo']).write_bytes(b'corrompido')
+                segundo=recepcao.receber(c,{'urls':['https://exemplo.org/provas']})
+            self.assertEqual(len(segundo['erros']),1)
+            self.assertEqual(len(segundo['reservas']),1)
+            self.assertEqual(segundo['reservas'][0]['titulo'],'Prova 2')
+
+    def test_urls_repetidas_nao_repetem_reserva_no_resultado(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            c=Captador(tmp)
+            candidato={'titulo':'Prova','prova_url':'https://exemplo.org/p.pdf','gabarito_url':'https://exemplo.org/g.pdf'}
+            with patch.object(recepcao,'descobrir',return_value={'pdf_direto':False,'candidatos':[candidato]}),patch.object(recepcao,'obter',return_value=(b'%PDF-1.4',{})):
+                r=recepcao.receber(c,{'urls':['https://exemplo.org/pagina']*2})
+            self.assertEqual(len(r['reservas']),1)
+
 if __name__=='__main__':unittest.main()
