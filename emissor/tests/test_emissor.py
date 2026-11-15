@@ -34,7 +34,7 @@ class EmissorTest(unittest.TestCase):
         q.parent.mkdir(parents=True)
         q.write_text('[0,"Outra questão",["A","B"]]\n')
         cls.antes = cls.hashes()
-        cls.server = servidor.criar_servidor(cls.base, 0, Path(cls.temp.name)/'captacoes')
+        cls.server = servidor.criar_servidor(cls.base, 0, Path(cls.temp.name)/'captacoes', Path(cls.temp.name)/'digitalizacoes')
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         cls.url = f'http://127.0.0.1:{cls.server.server_port}'
@@ -169,6 +169,28 @@ class EmissorTest(unittest.TestCase):
         self.assertEqual(fila['estado'],'aguardando_digitalizador')
         self.assertTrue((Path(self.temp.name)/'captacoes'/fila['arquivo']).is_file())
         self.assertEqual(self.get()['total'],5)  # Upload não criou questões extraídas.
+
+    def test_processamento_http_sem_ia(self):
+        import base64
+        spec = importlib.util.spec_from_file_location('pdf_fixtures',ROOT/'digitalizador/tests/test_digitalizador.py')
+        fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)
+        with urlopen(self.url+'/api/captacao') as r:token=json.load(r)['token_captacao']
+        headers={'Content-Type':'application/json','Origin':self.url,'X-Captacao-Token':token}
+        def post(path,dados):
+            with urlopen(Request(self.url+path,data=json.dumps(dados).encode(),headers=headers),timeout=60) as r:
+                return json.load(r)
+        lote=post('/api/captacao/criar',{'prova':'ENAM sintético HTTP','edicao':'2026.1','caderno':'Tipo 1',
+                  'orgao_id':'N32','cargo_id':'a2','orgao':'Órgão fictício','cargo':'Cargo fictício','banca':'FGV','ano':'2026'})
+        with self.assertRaises(HTTPError):post('/api/digitalizacao/processar',{'lote':lote['id']})
+        for tipo,raw in zip(('prova','gabarito'),fixture.documentos()):
+            d={'lote':lote['id'],'nome':tipo+'.pdf','tipo':tipo,'conteudo_base64':base64.b64encode(raw).decode()}
+            if tipo=='gabarito':d['situacao_gabarito']='definitivo'
+            lote=post('/api/captacao/anexar',d)
+        post('/api/captacao/encaminhar',{'lote':lote['id'],'gabarito_sha256':lote['documentos'][1]['sha256']})
+        r=post('/api/digitalizacao/processar',{'lote':lote['id']})
+        self.assertEqual(r['contagens']['questoes'],80)
+        self.assertTrue(all(q['abordagem']['geracao']=='regras' for q in r['questoes']))
+        self.assertEqual(self.get()['total'],5)
 
 
 if __name__ == '__main__':

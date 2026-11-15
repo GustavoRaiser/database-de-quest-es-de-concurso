@@ -1,7 +1,7 @@
 let tokenCaptacao='',captacaoCarregada=false;
 const cap=id=>document.getElementById(id);
 function capElemento(tag,texto){const e=document.createElement(tag);e.textContent=texto;return e;}
-function canais(){cap('campo-upload').hidden=cap('canal-material').value!=='upload';cap('campo-pasta').hidden=cap('canal-material').value!=='pasta';cap('campo-situacao').hidden=cap('tipo-documento').value!=='gabarito';}
+function canais(){cap('campo-upload').hidden=cap('canal-material').value!=='upload';cap('campo-pasta').hidden=cap('canal-material').value!=='pasta';cap('campo-url').hidden=cap('canal-material').value!=='url';cap('campo-situacao').hidden=cap('tipo-documento').value!=='gabarito';}
 async function atualizarCaptacao(selecionado){
   const r=await fetch('/api/captacao');const d=await r.json();if(!r.ok)throw Error(d.erro);
   tokenCaptacao=d.token_captacao;const destino=cap('lote-destino'),anterior=selecionado||destino.value;destino.replaceChildren();
@@ -19,7 +19,8 @@ cap('aba-captacao').onclick=async()=>{cap('area-consulta').hidden=true;cap('area
 cap('criar-lote').onsubmit=e=>{e.preventDefault();executarCaptacao(e.currentTarget,async()=>{const dados=Object.fromEntries(new FormData(cap('criar-lote')));const d=await postarCaptacao(dados.lote?'identificar':'criar',dados);cancelarIdentificacao();await atualizarCaptacao(d.id);cap('aviso-captacao').textContent=`Protocolo ${d.protocolo} registrado. Adicione prova e gabarito para liberar o encaminhamento.`;});};
 cap('anexar-material').onsubmit=e=>{e.preventDefault();executarCaptacao(e.currentTarget,async()=>{
   const dados=Object.fromEntries(new FormData(cap('anexar-material')));if(!dados.lote)throw Error('Crie ou selecione um lote.');if(dados.tipo!=='gabarito')dados.situacao_gabarito='';
-  if(cap('canal-material').value==='pasta'){dados.nome=cap('arquivo-pasta').value;dados.entrada=dados.nome;if(!dados.nome)throw Error('Nenhum arquivo selecionado na pasta.');}
+  if(cap('canal-material').value==='url'){dados.url=cap('arquivo-url').value;dados.nome=dados.tipo+'.pdf';if(!dados.url)throw Error('Informe a URL do PDF.');}
+  else if(cap('canal-material').value==='pasta'){dados.nome=cap('arquivo-pasta').value;dados.entrada=dados.nome;if(!dados.nome)throw Error('Nenhum arquivo selecionado na pasta.');}
   else{const f=cap('arquivo-material').files[0];if(!f)throw Error('Selecione um arquivo.');if(f.size>15*1024*1024)throw Error('O limite é 15 MiB por arquivo.');dados.nome=f.name;dados.conteudo_base64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(Error('Falha na leitura do arquivo'));reader.onload=()=>resolve(reader.result.split(',')[1]);reader.readAsDataURL(f);});}
   const d=await postarCaptacao('anexar',dados);cap('arquivo-material').value='';await atualizarCaptacao(d.id);cap('aviso-captacao').textContent='Documento recebido. Original e vínculo registrados.';
 });};
@@ -43,6 +44,7 @@ function mostrarRegistro(){
     if(lote.versao===1){const b=capElemento('button','Identificar lote antigo');b.type='button';b.onclick=()=>{const form=cap('criar-lote');for(const [k,v]of Object.entries(i)){if(form.elements.namedItem(k))form.elements.namedItem(k).value=v;}cap('identificar-legado').value=lote.id;cap('salvar-protocolo').textContent='Salvar identificação do lote';cap('cancelar-identificacao').hidden=false;form.scrollIntoView();};a.append(b);}
     const g=document.createElement('select');g.setAttribute('aria-label','Gabarito a encaminhar');for(const d of lote.documentos.filter(d=>d.tipo==='gabarito')){const o=capElemento('option',`${d.situacao_gabarito}: ${d.nome_original} · ${d.sha256.slice(0,10)}`);o.value=d.sha256;g.append(o);}
     const enviar=capElemento('button','Encaminhar prova + gabarito');enviar.type='button';enviar.disabled=!lote.liberado;enviar.onclick=async()=>{enviar.disabled=true;try{const d=await postarCaptacao('encaminhar',{lote:lote.id,gabarito_sha256:g.value});await atualizarCaptacao(lote.id);cap('aviso-captacao').textContent=`${d.protocolo}: pacote registrado na fila. Extração ainda não iniciada.`;}catch(e){cap('aviso-captacao').textContent='Erro: '+e.message;enviar.disabled=!lote.liberado;}};a.append(g,enviar);
+    const processar=capElemento('button','Processar ENAM Tipo 1 no computador');processar.type='button';processar.disabled=!lote.liberado||!lote.encaminhamento;processar.onclick=()=>processarLote(lote,processar);a.append(processar);
     if(lote.encaminhamento){const f=document.createElement('form');f.append(capElemento('p','Registrar análise manual do usuário (não executa extração).'));const sel=document.createElement('select');sel.name='resultado';for(const v of ['concluida','falha']){const o=capElemento('option',v);o.value=v;sel.append(o);}sel.setAttribute('aria-label','Resultado da análise');const rel=document.createElement('textarea');rel.required=true;rel.name='relatorio';rel.placeholder='Descreva o resultado da análise realizada';rel.setAttribute('aria-label','Relatório da análise');const b=capElemento('button','Registrar análise manual');b.type='submit';f.append(sel,rel,b);f.onsubmit=e=>{e.preventDefault();executarCaptacao(f,async()=>{await postarCaptacao('registrar_analise',{lote:lote.id,encaminhamento:lote.encaminhamento,resultado:sel.value,relatorio:rel.value});await atualizarCaptacao(lote.id);cap('aviso-captacao').textContent='Análise declarada pelo usuário registrada no histórico.';});};a.append(f);}
     const detalhes=document.createElement('details');detalhes.append(capElemento('summary','Registro e histórico'),capElemento('pre',JSON.stringify(lote,null,2)));a.append(detalhes);cap('lista-lotes').append(a);
   }
@@ -53,3 +55,21 @@ let catalogosCaptacao={orgaos:{},cargos:{}};
 fetch('/api/catalogos').then(r=>r.json()).then(d=>{catalogosCaptacao=d;for(const [id,nome]of Object.entries(d.orgaos||{})){const o=capElemento('option',nome);o.value=id;cap('cap-orgaos').append(o);}}).catch(()=>{});
 cap('cap-orgao-id').onchange=()=>{const id=cap('cap-orgao-id').value;if(catalogosCaptacao.orgaos[id])cap('cap-orgao-nome').value=catalogosCaptacao.orgaos[id];cap('cap-cargos').replaceChildren();for(const [key,nome]of Object.entries(catalogosCaptacao.cargos)){if(key.startsWith(id+'.')){const o=capElemento('option',nome);o.value=key.split('.')[1];cap('cap-cargos').append(o);}}};
 cap('cap-cargo-id').onchange=()=>{const nome=catalogosCaptacao.cargos[cap('cap-orgao-id').value+'.'+cap('cap-cargo-id').value];if(nome)cap('cap-cargo-nome').value=nome;};
+
+cap('descobrir-url').onsubmit=e=>{e.preventDefault();executarCaptacao(e.currentTarget,async()=>{
+  const d=await postarCaptacao('descobrir',{url:cap('url-listagem').value});cap('links-descobertos').replaceChildren();
+  function usar(url,tipo){cap('canal-material').value='url';cap('arquivo-url').value=url;cap('tipo-documento').value=tipo;canais();cap('anexar-material').scrollIntoView();}
+  if(d.pdf_direto){const b=capElemento('button','Usar este PDF no tipo de documento selecionado');b.type='button';b.onclick=()=>usar(d.url,cap('tipo-documento').value);cap('links-descobertos').append(b);}
+  for(const item of d.candidatos){const a=document.createElement('article');a.append(capElemento('h4',item.titulo));for(const [campo,tipo]of [['prova_url','prova'],['gabarito_url','gabarito']])if(item[campo]){const b=capElemento('button','Selecionar '+tipo);b.type='button';b.onclick=()=>usar(item[campo],tipo);a.append(b);}cap('links-descobertos').append(a);}
+  cap('aviso-captacao').textContent=d.pdf_direto?'PDF localizado.':`${d.candidatos.length} conjunto(s) de links. Confira identidade, edição e caderno antes de receber os documentos.`;
+});};
+async function processarLote(lote,botao){
+  botao.disabled=true;cap('aviso-captacao').textContent='Processando no computador. Aguarde a extração do PDF…';
+  try{const r=await fetch('/api/digitalizacao/processar',{method:'POST',headers:{'Content-Type':'application/json','X-Captacao-Token':tokenCaptacao},body:JSON.stringify({lote:lote.id})});const d=await r.json();if(!r.ok)throw Error(d.erro);
+    const alvo=cap('resultado-digitalizacao');alvo.replaceChildren(capElemento('h3',`Prévia: ${d.contagens.questoes} questões · ${d.contagens.assertivas} alternativas`),capElemento('p',`Estado: ${d.estado}. Extração intermediária; ainda não incorporada ao acervo.`));
+    for(const p of d.pendencias)alvo.append(capElemento('p','Pendente: '+p));
+    const baixar=capElemento('button','Baixar resultado JSON');baixar.type='button';baixar.onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='extracao-'+d.protocolo+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};alvo.append(baixar);
+    for(const q of d.questoes){const detalhe=document.createElement('details');detalhe.append(capElemento('summary',`Questão ${q.numero_original} · ${q.disciplina||'Disciplina não identificada'}`),capElemento('p',q.enunciado));const ol=document.createElement('ol');for(const t of q.assertivas)ol.append(capElemento('li',t));detalhe.append(ol,capElemento('p',`Gabarito ${q.gabarito.situacao}: ${q.gabarito.rotulos_originais.join(', ')||'anulada'}`),capElemento('p',q.abordagem.sintese));for(const p of [...q.pendencias,...q.abordagem.pendencias])detalhe.append(capElemento('p','Pendente: '+p));alvo.append(detalhe);}
+    await atualizarCaptacao(lote.id);cap('aviso-captacao').textContent='Extração concluída com pendências indicadas. Nenhuma IA foi chamada.';alvo.scrollIntoView();
+  }catch(e){cap('aviso-captacao').textContent='Erro: '+e.message;botao.disabled=false;}
+}

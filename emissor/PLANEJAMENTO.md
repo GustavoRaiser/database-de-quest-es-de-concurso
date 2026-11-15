@@ -9,3 +9,5 @@ Evoluções possíveis: índice para acelerar contagens, seleção de base pela 
 Implementada a área Adicionar material, compartilhando a interface com a consulta e delegando criação/anexação ao Captador. Próxima integração: processamento real pelo Digitalizador, ainda não disponível.
 
 Registro de provas implementado com filtros de protocolo, dados da aplicação e estados. Encaminhamento protegido exige prova e gabarito; análises podem ser registradas manualmente com relatório. O Digitalizador ainda não executa os pacotes.
+
+Implementados: descoberta/download de URLs delegados ao Captador e processamento ENAM/FGV Tipo 1 delegado ao Digitalizador, com prévia e JSON. A extração já é executada por código no host, sem IA.

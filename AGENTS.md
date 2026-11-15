@@ -56,3 +56,7 @@ O Captador só pode encaminhar um lote identificado com prova e gabarito íntegr
 ## Objetivo analítico
 
 Guiar a evolução por OBJETIVO.md: permitir que IA em CLI/harness compare tópicos dos PDFs de estudo do usuário com frequência e recência de cobrança em provas. Manter linhas de questões compactas e detalhamento da prova em registro próprio, ligado por procedência. Distinguir data da aplicação de data de coleta, cadernos de ocorrências reais e ausência na amostra de ausência de cobrança. Recomendações documentadas ainda não implementadas não autorizam ampliar a tarefa atual.
+
+## Execução sem IA
+
+Por decisão do usuário, download, extração, associação de gabarito, descritores e cálculos são executados por código no servidor/host/computador. Não introduzir chamadas a modelos na operação. IA pode ajudar a desenvolver as ferramentas e consumir resultados posteriormente. Regras lexicais não equivalem a interpretação semântica: rotular limitações e retornar Não identificado quando não houver correspondência. O extrator atual suporta apenas o perfil ENAM/FGV Tipo 1 documentado no Digitalizador.

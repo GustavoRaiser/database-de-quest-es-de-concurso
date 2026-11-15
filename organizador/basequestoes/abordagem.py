@@ -29,7 +29,7 @@ def validar(abordagem, q, metadados):
     for campo in ('sintese', 'conteudo_exigido', 'recorte_especifico', 'estrutura', 'autor'):
         exigir(texto(abordagem.get(campo)), f'abordagem exige {campo}')
     exigir(abordagem.get('raciocinio') in RACIOCINIOS, 'raciocínio inválido')
-    exigir(abordagem.get('geracao') in ('ia', 'humano'), 'geração deve ser ia ou humano')
+    exigir(abordagem.get('geracao') in ('ia', 'humano', 'regras'), 'geração deve ser ia, humano ou regras')
     if abordagem['geracao'] == 'ia':
         exigir(texto(abordagem.get('modelo')), 'informar modelo que gerou a abordagem')
     conceitos = abordagem.get('conceitos')

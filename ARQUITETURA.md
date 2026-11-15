@@ -18,7 +18,7 @@ Missão: transformar a fonte em conteúdo estruturado fiel, identificando perdas
 
 Terá código próprio para PDF, imagem/OCR, layout, HTML e adaptação de entradas estruturadas, com testes e dependências na própria pasta digitalizador/. Preserva número original, página, versão de caderno, fontes e materiais de apoio. Não inventa informações ausentes nem avalia automaticamente a atualidade jurídica.
 
-Entrega candidatos e relatórios; não escreve no acervo definitivo. Sua estrutura documental está preparada, mas nenhum extrator foi implementado nesta reorganização.
+Entrega candidatos e relatórios; não escreve no acervo definitivo. O extrator ENAM/FGV Tipo 1 já foi implementado; ver digitalizador/README.md.
 
 ## Fluxo de trabalho previsto
 
@@ -38,7 +38,7 @@ Organizador: validação + armazenamento + ID local por linha
 Emissor: consulta e visualização conjunta de questão, metadados e recursos
 ```
 
-As etapas futuras de extração e inclusão não estão ligadas por automação hoje. O contrato de entrega deve ser implementado antes dessa conexão. Não há etapa obrigatória de revisão jurídica nem agente de atualização automática. A desatualização é informada manualmente pelo usuário.
+A extração do perfil ENAM/FGV Tipo 1 já está ligada à captação e à interface. A inclusão definitiva de questões ainda precisa ser implementada. Não há etapa obrigatória de revisão jurídica nem agente de atualização automática. A desatualização é informada manualmente pelo usuário.
 
 ## Organização física de um tema
 
@@ -60,8 +60,12 @@ Pasta emissor/: interface no navegador e API JSON de leitura, com filtros opcion
 
 ## Captador e interface compartilhada
 
-Captador implementado em captador/: entrada por upload ou seleção manual de pasta, lotes por prova/edição/caderno e associação de gabaritos/retificações à prova. A área Adicionar material no Emissor consome sua CLI pública. A prévia é documental, com hashes e pendências. O Digitalizador segue planejado; nenhuma questão é extraída ou incorporada automaticamente ao Organizador. O gabarito pode chegar depois. A situação jurídica da questão é informada pelo usuário.
+Captador implementado em captador/: entrada por upload ou seleção manual de pasta, lotes por prova/edição/caderno e associação de gabaritos/retificações à prova. A área Adicionar material no Emissor consome sua CLI pública. A prévia é documental, com hashes e pendências. O Digitalizador extrai o perfil ENAM/FGV Tipo 1 em formato intermediário; a incorporação ao Organizador permanece pendente. O gabarito pode chegar depois. A situação jurídica da questão é informada pelo usuário.
 
 O Captador usa protocolos órgão.cargo.prova e mantém registro filtrável e histórico. A barreira de encaminhamento exige prova e gabarito íntegros e vinculados, além da identificação. A fila registra um pacote, não a execução. Análise concluída/falha pode ser declarada manualmente pelo usuário com relatório.
 
 A preparação temática do Organizador agora fornece uma tarefa de abordagem à IA/harness e registra o perfil fundamentado nos metadados. O Compilador poderá usá-lo para buscar candidatas, sempre retornando ao conteúdo completo na comparação. Não há comparação ou score implementado.
+
+## Operação por código no host
+
+A cadeia de URL/arquivos até extração e descritores locais funciona sem IA para o perfil suportado. O Emissor apresenta a prévia; o acervo definitivo é preservado. Descritores lexicais não são equiparados a interpretação semântica. Interfaces históricas para harness não são chamadas nesse fluxo.

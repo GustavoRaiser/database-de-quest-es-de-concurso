@@ -65,3 +65,9 @@ A interface agora inclui a área Adicionar material. Ela permite criar lotes, en
 Adicionar material agora exige os códigos e nomes de órgão/cargo, banca e ano, além de prova/edição/caderno. Campos opcionais permitem escolaridade, áreas, UF, esfera, etapa, edital e data. A lista de protocolos possui filtros próprios e histórico por prova. A interface sugere códigos conhecidos; novos códigos são referências do Captador, sem cadastrar categorias no Organizador.
 
 O botão de encaminhar só é habilitado com prova e gabarito íntegros e identificação completa. O servidor e a CLI repetem a validação. O usuário escolhe o gabarito; a ação registra o pacote na fila e ainda não extrai PDFs. Lotes antigos têm ação de identificação. Há registro manual de resultado de análise, com relatório explícito do usuário.
+
+## Download e processamento no host
+
+Instale primeiro `python -m pip install -r digitalizador/requirements.txt`. Em Adicionar material, é possível buscar links em uma página e selecionar prova/gabarito ou informar uma URL direta. Após receber ambos, encaminhe e clique Processar ENAM Tipo 1 no computador. A API POST /api/digitalizacao/processar recebe {"lote":"UUID"}, usando a mesma proteção de origem e sessão da captação. A interface apresenta enunciados, alternativas, gabaritos, descritores locais, pendências e download do JSON intermediário.
+
+A extração ocorre no servidor local, sem IA, com apenas um processamento simultâneo. Os resultados ficam em digitalizador/trabalho/ ou --digitalizacoes CAMINHO. Eles são separados do acervo definitivo. Outros layouts, OCR e incorporação automática não estão disponíveis. Descritores são lexicais e podem retornar Não identificado; não são uma compreensão semântica garantida.

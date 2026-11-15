@@ -9,6 +9,7 @@ import re
 import secrets
 import subprocess
 import sys
+import threading
 from urllib.parse import parse_qs, urlsplit
 
 MODULO = Path(__file__).resolve().parent
@@ -23,11 +24,13 @@ def consultar(base, comando, argumentos=()):
     return json.loads(processo.stdout)
 
 
-def criar_servidor(base, porta=8000, captacoes=None):
+def criar_servidor(base, porta=8000, captacoes=None, digitalizacoes=None):
     base = Path(base).resolve()
     consultar(base, "validar")
     captacoes = Path(captacoes or MODULO.parent / "captador/trabalho").resolve()
     token = secrets.token_urlsafe(32)
+    digitalizacoes = Path(digitalizacoes or MODULO.parent/'digitalizador/trabalho').resolve()
+    processamento = threading.BoundedSemaphore(1)
 
     def captar(comando, dados=None):
         p = subprocess.run([sys.executable, str(MODULO.parent / "captador/app.py"),
@@ -108,8 +111,9 @@ def criar_servidor(base, porta=8000, captacoes=None):
                     or self.headers.get('X-Captacao-Token') != token):
                 self.responder(403, {"erro": "Origem ou sessão inválida; recarregue a página"})
                 return
-            comandos = {'/api/captacao/' + c: c for c in ('criar','anexar','identificar','encaminhar','registrar_analise')}
-            if self.path not in comandos:
+            comandos = {'/api/captacao/' + c: c for c in ('criar','anexar','identificar','encaminhar','registrar_analise','descobrir')}
+            processar = self.path == '/api/digitalizacao/processar'
+            if self.path not in comandos and not processar:
                 self.responder(404, {"erro": "Não encontrado"})
                 return
             try:
@@ -125,7 +129,23 @@ def criar_servidor(base, porta=8000, captacoes=None):
                 dados = json.loads(corpo)
                 if not isinstance(dados, dict):
                     raise ValueError("Enviar um objeto JSON")
-                self.responder(200, captar(comandos[self.path], dados))
+                if processar:
+                    lote = dados.get('lote')
+                    if not isinstance(lote, str) or not re.fullmatch('[a-f0-9]{32}', lote):
+                        raise ValueError('Lote inválido')
+                    if not processamento.acquire(blocking=False):
+                        raise ValueError('Já existe um processamento em andamento; aguarde')
+                    try:
+                        p = subprocess.run([sys.executable,str(MODULO.parent/'digitalizador/app.py'),
+                                            '--captacoes',str(captacoes),'--saida',str(digitalizacoes),
+                                            '--base',str(base),lote],capture_output=True,text=True,encoding='utf-8',timeout=300)
+                        if p.returncode:
+                            raise ValueError(p.stderr.strip())
+                        self.responder(200,json.loads(p.stdout))
+                    finally:
+                        processamento.release()
+                else:
+                    self.responder(200, captar(comandos[self.path], dados))
             except (ValueError, subprocess.TimeoutExpired) as exc:
                 self.responder(400, {"erro": str(exc)})
             except OSError:
@@ -139,9 +159,10 @@ def main():
     parser.add_argument("--base", type=Path, default=ORGANIZADOR)
     parser.add_argument("--porta", type=int, default=8000)
     parser.add_argument("--captacoes", type=Path, help="pasta de trabalho do Captador")
+    parser.add_argument('--digitalizacoes', type=Path, help='pasta de resultados do Digitalizador')
     args = parser.parse_args()
     try:
-        server = criar_servidor(args.base, args.porta, args.captacoes)
+        server = criar_servidor(args.base, args.porta, args.captacoes, args.digitalizacoes)
     except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
         parser.exit(1, f"Erro: {exc}\n")
     print(f"Emissor: http://127.0.0.1:{server.server_port} — base: {args.base.resolve()}", flush=True)

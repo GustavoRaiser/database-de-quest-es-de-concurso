@@ -22,3 +22,7 @@ Extrair fielmente enunciados, alternativas, textos de apoio, recursos e referên
 Definir contrato intermediário versionado, entradas, saídas, caminhos de artefatos e diagnóstico de pendências. Distinguir esse contrato do lote de procedência de questões já existentes no Organizador. Só documentar comandos como disponíveis depois de implementá-los e verificá-los.
 
 A primeira implementação deve ter amostras e verificações para colunas, cabeçalhos, continuidade de questão entre páginas, rótulos de alternativas e correspondência de gabarito/caderno. Mudanças na integração também atualizam ../CONTRATOS.md.
+
+## Implementação atual
+
+Ler CONTRATO.md e README.md. Operação por código local, sem IA. Perfil ENAM/FGV Tipo 1 explicitamente limitado. Manter testes para pacote incompleto/obsoleto, caderno, ordem, continuidade, alternativas e gabarito. Elementos visuais não reconstruídos precisam de pendência, não de sucesso silencioso. Usar a CLI pública do Captador para entrega e a do Organizador para descritores.

@@ -41,4 +41,4 @@ Mudanças de organização física devem preservar o conteúdo dos registros, me
 
 ## Preparação temática
 
-A abordagem da cobrança pertence ao Organizador; ler ABORDAGEM.md. Fornecer questão completa e apoios à IA/harness, preservar evidências, autoria, versão e vínculo ao conteúdo. Não usar palavras-chave como substituto de análise semântica. A ferramenta valida e registra perfis, mas não executa um modelo automaticamente. Não alterar categorias nem IDs como efeito da análise.
+A abordagem da cobrança pertence ao Organizador; ler ABORDAGEM.md. O fluxo padrão gera descritores por regras locais sem IA, preservando evidências, autoria, versão e vínculo ao conteúdo. Distinguir a ocorrência lexical de uma análise semântica; usar Não identificado quando não houver regra aplicável. O modo histórico de tarefa para harness não integra a operação automática. Não alterar categorias nem IDs como efeito da análise.

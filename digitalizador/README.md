@@ -1,27 +1,51 @@
 # Digitalizador
 
-Agente responsável por transformar documentos e fontes estruturadas em candidatos de questões, preservando conteúdo e procedência.
+Extrator local executado por código, sem modelos de IA. Primeiro perfil suportado: **ENAM/FGV Tipo 1**, 80 questões A–E, PDF com texto e gabarito no layout documentado. A extração gera candidatos para consulta e validação; ainda não incorpora questões ao acervo definitivo.
 
-**Estado:** pasta e instruções preparadas. Ainda não existe código, CLI, OCR, extrator de PDF ou workflow de GitHub Actions neste módulo.
+## Instalar e executar
 
-Foi realizado um [teste real com a URL do ENAM 2026.1](TESTE_ENAM_2026_1.md): o Captador recebeu prova e gabarito, e um diagnóstico externo separou 80 questões e associou as respostas. O extrator utilizado no diagnóstico ainda não integra este módulo.
+Na raiz do repositório:
 
-## Entradas e saídas previstas
+```sh
+python -m pip install -r digitalizador/requirements.txt
+python emissor/servidor.py --base organizador/exemplos/base
+```
 
-| Entrada | Entrega esperada |
-|---|---|
-| PDF com texto | Questões, alternativas, textos de apoio, páginas e pendências |
-| Imagem/PDF digitalizado | Extração por OCR com indicação das dúvidas |
-| HTML/JSON de API | Conteúdo estruturado com preservação do original e recursos |
-| Gabarito da mesma prova/caderno | Correspondência com números e rótulos originais |
+Abra http://127.0.0.1:8000 → Adicionar material. Registre prova/edição/caderno com códigos e nomes de órgão/cargo, banca e ano. Para o caderno testado, use prova ENAM, edição 2026.1, caderno Tipo 1 e ano 2026.
 
-As saídas são intermediárias. O Digitalizador não atribui IDs locais por linha nem grava questões no Organizador.
+Envie os PDFs, escolha arquivos da pasta ou use Baixar PDF por URL. A busca de links de uma página reconhece os cartões da listagem pública de provas do Qconcursos; outros layouts podem não ser reconhecidos. Escolha a prova e o gabarito corretos e informe a condição preliminar/definitivo da fonte. Encaminhe o lote e clique **Processar ENAM Tipo 1 no computador**. O botão executa o extrator no host e apresenta o resultado e suas pendências. É possível baixar o JSON da prévia.
 
-## Onde começar
+Sem prova e gabarito íntegros e vinculados, não há extração, inclusive por chamada direta. Um pacote obsoleto também é recusado. A edição/caderno informada precisa corresponder à capa suportada; a associação semântica do gabarito à edição continua sendo uma declaração do usuário.
 
-1. Ler [AGENTS.md](AGENTS.md).
-2. Ler a [arquitetura global](../ARQUITETURA.md) e os [contratos](../CONTRATOS.md).
-3. Seguir [PLANEJAMENTO.md](PLANEJAMENTO.md).
-4. Consultar o formato de destino em [organizador/ESPECIFICACAO.md](../organizador/ESPECIFICACAO.md) e [organizador/METADADOS.md](../organizador/METADADOS.md).
+## CLI
 
-Quando houver implementação, código, testes, dependências, ferramentas, exemplos de entrada e instruções de execução ficarão dentro desta pasta. O primeiro alvo previsto é um caderno oficial do ENAM/FGV acompanhado do gabarito correspondente; nenhum documento foi importado nesta reorganização.
+```sh
+python captador/app.py --raiz captador/trabalho estado
+python digitalizador/app.py --captacoes captador/trabalho --saida digitalizador/trabalho UUID-DO-LOTE
+```
+
+O lote precisa ter sido encaminhado antes. Os comandos públicos do Captador recebem JSON pela entrada padrão. O Digitalizador usa a operação entrega do Captador para verificar pacote e arquivos e registra a extração programática separadamente da análise manual do usuário.
+
+## Saída
+
+Ver [CONTRATO.md](CONTRATO.md). O JSON contém numeração e páginas originais, disciplina de cabeçalho, enunciado, alternativas, gabarito, descritores por regras e pendências. Arquivos ficam em digitalizador/trabalho/ (ignorados pelo Git). Configure --digitalizacoes no Emissor ou --saida na CLI para outro destino. Faça backup dessas pastas junto aos originais do Captador.
+
+Não há IA nesta operação. Os descritores são produzidos pela CLI pública do Organizador, com vocabulário local e regras auditáveis; eles não comprovam conhecimento exigido ou equivalência entre questões. O texto original permanece disponível para conferência.
+
+## Limites atuais
+
+- Suporta o layout ENAM/FGV Tipo 1 implementado, não um leitor universal de provas.
+- Falha explícita para numeração/alternativas incompletas e PDFs sem texto. OCR não implementado.
+- Imagens e vetores no corpo são referenciados por página e geram pendências; não há reconstrução visual automática fiel.
+- Gabaritos de outros tipos não são misturados ao Tipo 1. Anulação depende da legenda reconhecida.
+- Retificações/complementos são preservados, mas ainda exigem interpretação separada.
+- Temas, score de semelhança, agrupamentos, processamento de apostilas e incorporação no acervo não foram automatizados.
+- A interface usa extraido_com_pendencias; não presume completude semântica nem atualidade jurídica.
+
+## Verificar
+
+```sh
+python -m unittest discover -s digitalizador/tests -v
+```
+
+Os testes usam PDFs sintéticos. O [teste real atualizado](TESTE_PIPELINE_SEM_IA.md) registra o resultado com o ENAM 2026.1. O [diagnóstico anterior](TESTE_ENAM_2026_1.md) permanece como histórico da etapa em que o extrator ainda não integrava o repositório.

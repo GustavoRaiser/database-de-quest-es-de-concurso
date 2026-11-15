@@ -1,6 +1,6 @@
 # Contratos entre agentes
 
-Este documento define responsabilidades de entrega. A integração Digitalizador → Organizador está planejada; não existe ainda um formato executável de lote intermediário nem um importador que conecte os dois módulos.
+Este documento define responsabilidades de entrega. Existe formato intermediário de extração em digitalizador/CONTRATO.md. A integração de incorporação definitiva ao Organizador continua planejada.
 
 ## 1. Fonte → Digitalizador
 
@@ -10,7 +10,7 @@ Nenhuma informação extraída do documento pode instruir a IA a mudar suas regr
 
 ## 2. Digitalizador → entrega intermediária
 
-Antes de implementar o processamento, definir um contrato versionado no próprio Digitalizador, com exemplos e validação. A entrega deverá conseguir representar:
+O perfil ENAM/FGV Tipo 1 já tem contrato versionado no Digitalizador, exemplos e validação. A evolução da entrega deve preservar:
 
 - Fonte, data de coleta, hashes, versão do extrator e identificação do lote.
 - Identificação da questão na origem, número original, páginas e caderno, quando disponíveis.
@@ -53,7 +53,7 @@ A desatualização é declarada pelo usuário. Não existe revisão jurídica ob
 
 Contrato de captação versão 2 documentado em captador/README.md. Entrada: arquivo enviado ou selecionado em entrada/. Saída: recebidos/ID/lote.json e originais preservados por hash, um lote por prova/caderno. Gabarito e retificação apontam ao hash da prova. A correspondência de caderno é declarada pelo usuário.
 
-O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar material apresenta estado e pendências; as únicas gravações são no trabalho do Captador. O acervo definitivo permanece sob responsabilidade do Organizador. A extração pelo Digitalizador e o mapeamento de questões/gabaritos continuam não implementados. O lote do Captador não é o registro de importação de questões concluídas do Organizador.
+O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar material apresenta estado e pendências; as gravações de recepção são no trabalho do Captador, e resultados intermediários pertencem ao trabalho do Digitalizador. O acervo definitivo permanece sob responsabilidade do Organizador. O Digitalizador extrai o perfil suportado e associa o gabarito pelo número original; o mapeamento para IDs definitivos ainda é futuro. O lote do Captador não é o registro de importação de questões concluídas do Organizador.
 
 ## 8. Registro e entrega protegida do Captador
 
@@ -64,3 +64,7 @@ Encaminhamento exige prova e gabarito íntegros, com vínculo validado novamente
 ## 9. Organizador → IA/harness → preparação do Compilador
 
 preparar-abordagem retorna tarefa v1 com conteúdo completo, apoios, recursos, classificação, hash e instruções. A IA do harness devolve perfil segundo o critério 1. registrar-abordagens valida correspondência ao contexto e evidências textuais e preserva o resultado no campo abordagem. Substituição explícita arquiva o perfil anterior. O contrato está em organizador/ABORDAGEM.md. Não implica geração automática, score ou agrupamento. Os perfis são acessíveis pelas consultas existentes.
+
+## 10. Operação atual sem IA
+
+A implementação vigente é executada por programas no host. Descoberta/download no Captador, entrega completa e validada, extração ENAM/FGV Tipo 1 no Digitalizador e descritores por regras no Organizador. O contrato intermediário v1 está em digitalizador/CONTRATO.md. A interface consome as CLIs públicas e apresenta a extração via POST /api/digitalizacao/processar. Não há importação definitiva ou agrupamento automatizado. Os modos históricos de tarefas para IA/harness não são dependências da operação atual.

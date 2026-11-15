@@ -135,6 +135,8 @@ class Captador:
                        'aguardando_prova' if not provas else 'aguardando_gabarito' if not gabaritos else 'aguardando_identificacao')
         m['processamento'] = ('analise_registrada' if m.get('analise') else
                               'aguardando_digitalizador' if m.get('encaminhamento') else 'nao_iniciado')
+        if m.get('extracao', {}).get('encaminhamento') == m.get('encaminhamento') and m.get('extracao'):
+            m['processamento'] = m['extracao']['estado']
         return m
 
     def registrar_identidade(self, identidade, ignorar=None):
@@ -200,7 +202,13 @@ class Captador:
         situacao = dados.get("situacao_gabarito", "")
         exigir(situacao in ("preliminar", "definitivo") if tipo == "gabarito" else situacao == "",
                "Informar preliminar/definitivo apenas para gabaritos")
-        if "entrada" in dados:
+        rede = None
+        if 'url' in dados:
+            from rede import obter
+            conteudo, rede = obter(dados['url'])
+            exigir(conteudo.startswith(b'%PDF-'), 'O endereço deve apontar diretamente para um PDF')
+            canal = 'url'
+        elif "entrada" in dados:
             exigir(dados["entrada"] == nome, "Selecionar nome da pasta de entrada")
             p = self.raiz / "entrada" / nome
             exigir(not p.is_symlink() and p.is_file(), "Arquivo de entrada não encontrado")
@@ -214,7 +222,7 @@ class Captador:
             canal = "upload"
         exigir(0 < len(conteudo) <= LIMITE, "Arquivo vazio ou acima de 15 MiB")
         sha = hashlib.sha256(conteudo).hexdigest()
-        url = dados.get("url_origem", "")
+        url = dados.get('url', dados.get("url_origem", ""))
         exigir(isinstance(url, str) and len(url) <= 2000, "URL de origem inválida")
         with self.bloqueio():
             m = self.ler(dados.get("lote"))
@@ -226,6 +234,8 @@ class Captador:
                  "tamanho": len(conteudo), "tipo": tipo, "situacao_gabarito": situacao,
                  "referente_a": provas[0]["sha256"] if provas and tipo in ("gabarito", "retificacao") else None,
                  "recebido_em": agora(), "canal": canal, "url_origem": url}
+            if rede:
+                d['download'] = rede
             p = self.pasta(m["id"])
             exigir(not (p / "originais").is_symlink(), "Pasta de originais inválida")
             destino = p / d["arquivo"]
@@ -238,6 +248,7 @@ class Captador:
                 m["documentos"].append(d)
                 m.pop('encaminhamento', None)
                 m.pop('analise', None)
+                m.pop('extracao', None)
                 m.setdefault('historico', []).append({'evento':'documento_recebido','em':agora(),'sha256':sha,'tipo':tipo})
                 for campo in ("estado", "pendencias", "processamento"):
                     m.pop(campo, None)
@@ -270,6 +281,7 @@ class Captador:
             if m.get('encaminhamento') != digest:
                 m['encaminhamento'] = digest
                 m.pop('analise', None)
+                m.pop('extracao', None)
                 m.setdefault('historico',[]).append({'evento':'encaminhado','em':agora(),'id':digest})
                 gravar(self.pasta(m['id']) / 'lote.json', m)
         return {'id':digest, 'arquivo':'encaminhamentos/'+digest+'.json', 'protocolo':m['protocolo'], 'estado':'aguardando_digitalizador'}
@@ -283,6 +295,35 @@ class Captador:
                             'encaminhamento':m['encaminhamento'], 'declarada_por':'usuario'}
             m.setdefault('historico',[]).append(dict(m['analise'], evento='analise_registrada'))
             gravar(self.pasta(m['id']) / 'lote.json', m)
+        return self.ler(m['id'])
+
+    def entrega(self, dados):
+        with self.bloqueio():
+            m = self.ler(dados.get('lote'))
+            exigir(m['liberado'] and m.get('encaminhamento'), 'Lote incompleto ou não encaminhado')
+            id_ = m['encaminhamento']
+            exigir(re.fullmatch('[a-f0-9]{64}', id_) and dados.get('encaminhamento', id_) == id_, 'Encaminhamento inválido ou obsoleto')
+            path = self.raiz / 'encaminhamentos' / (id_ + '.json')
+            exigir(not path.is_symlink(), 'Pacote inválido')
+            envelope = json.loads(path.read_text(encoding='utf-8'))
+            pacote = envelope['pacote']
+            digest = hashlib.sha256(json.dumps(pacote, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+            exigir(digest == id_ and envelope['id'] == id_, 'Pacote corrompido')
+            exigir(pacote['lote'] == m['id'] and pacote['identificacao'] == m['identificacao'], 'Identificação divergente')
+            exigir(pacote['prova'] in m['documentos'] and pacote['gabarito'] in m['documentos'], 'Documentos divergentes')
+            return envelope
+
+    def registrar_extracao(self, dados):
+        with self.bloqueio():
+            m = self.ler(dados.get('lote'))
+            exigir(m['liberado'] and m.get('encaminhamento') == dados.get('encaminhamento') and m.get('encaminhamento'), 'Lote incompleto ou encaminhamento obsoleto')
+            exigir(isinstance(dados.get('resultado_id'), str) and re.fullmatch('[a-f0-9]{64}', dados['resultado_id']), 'Resultado inválido')
+            exigir(dados.get('estado') in ('extraido', 'extraido_com_pendencias') and isinstance(dados.get('contagens'), dict), 'Estado de extração inválido')
+            if m.get('extracao', {}).get('resultado_id') != dados['resultado_id']:
+                m['extracao'] = {k:dados[k] for k in ('resultado_id','encaminhamento','estado','contagens')}
+                m['extracao']['em'] = agora()
+                m.setdefault('historico', []).append(dict(m['extracao'], evento='extracao_programatica'))
+                gravar(self.pasta(m['id'])/'lote.json', m)
         return self.ler(m['id'])
 
     def estado(self):
@@ -302,11 +343,15 @@ def main():
     parser = argparse.ArgumentParser(description="Captador de materiais originais")
     parser.add_argument('--raiz', type=Path, default=Path(__file__).parent / 'trabalho')
     parser.add_argument('--catalogos', type=Path, help='catálogos do Organizador para conferir códigos existentes')
-    parser.add_argument('comando', choices=['estado', 'criar', 'anexar', 'identificar', 'encaminhar', 'registrar_analise'])
+    parser.add_argument('comando', choices=['estado', 'criar', 'anexar', 'identificar', 'encaminhar', 'registrar_analise', 'descobrir', 'entrega', 'registrar_extracao'])
     args = parser.parse_args()
     try:
         c = Captador(args.raiz, args.catalogos)
-        resposta = c.estado() if args.comando == 'estado' else getattr(c, args.comando)(json.load(sys.stdin))
+        if args.comando == 'descobrir':
+            from rede import descobrir
+            resposta = descobrir(json.load(sys.stdin)['url'])
+        else:
+            resposta = c.estado() if args.comando == 'estado' else getattr(c, args.comando)(json.load(sys.stdin))
         print(json.dumps(resposta, ensure_ascii=False))
     except (ValueError, OSError, KeyError, TypeError) as e:
         print(f"Erro: {e}", file=sys.stderr)

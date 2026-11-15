@@ -1,0 +1,17 @@
+{
+  "versao": 1,
+  "conceitos": [
+    {"id":"competencia_trabalhista","nome":"Competência da Justiça do Trabalho","termos":["Justiça do Trabalho","reclamação trabalhista"]},
+    {"id":"contribuicoes_previdenciarias","nome":"Contribuições previdenciárias","termos":["contribuições previdenciárias","contribuição previdenciária"]},
+    {"id":"controle_constitucionalidade","nome":"Controle de constitucionalidade","termos":["controle de constitucionalidade","ação direta de inconstitucionalidade","ação declaratória de constitucionalidade"]},
+    {"id":"coisa_julgada","nome":"Coisa julgada e ação rescisória","termos":["coisa julgada","ação rescisória","transitada em julgado"]},
+    {"id":"retrocesso_social","nome":"Proibição do retrocesso social","termos":["retrocesso social"]},
+    {"id":"reforma_constitucional","nome":"Reforma constitucional","termos":["emenda constitucional","emendas constitucionais","poder constituinte"]},
+    {"id":"tribunal_juri","nome":"Tribunal do Júri","termos":["Tribunal do Júri","soberania dos veredictos"]},
+    {"id":"responsabilidade_civil","nome":"Responsabilidade civil","termos":["responsabilidade civil","dano moral","danos morais"]},
+    {"id":"licitacoes","nome":"Licitações","termos":["licitação","licitações","licitação dispensável","inexigibilidade"]},
+    {"id":"prescricao","nome":"Prescrição","termos":["prescrição","prescricional"]},
+    {"id":"recuperacao_judicial","nome":"Recuperação judicial","termos":["recuperação judicial","plano de recuperação"]},
+    {"id":"contratos","nome":"Contratos","termos":["contrato","contratos"]}
+  ]
+}

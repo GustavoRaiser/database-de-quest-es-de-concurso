@@ -1,5 +1,7 @@
 # Teste real de URL — ENAM 2026.1
 
+**Registro histórico:** o diagnóstico abaixo foi seguido pela implementação integrada, documentada em [TESTE_PIPELINE_SEM_IA.md](TESTE_PIPELINE_SEM_IA.md). A indicação de “não implementado” descreve apenas o estado na execução deste diagnóstico inicial.
+
 Executado em 15/11/2026, a pedido do usuário. Este relatório registra um diagnóstico; não implementa um extrator nem altera o acervo definitivo.
 
 ## Fonte e seleção

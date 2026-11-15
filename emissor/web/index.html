@@ -18,6 +18,7 @@
 </div>
 <section id="area-captacao" hidden aria-label="Captação de material">
 <h2>Adicionar material</h2><p>Reúna uma prova e seu gabarito por edição e caderno. Os originais são preservados em um lote antes da digitalização.</p>
+<form id="descobrir-url"><h3>Localizar documentos em uma página</h3><label>URL pública HTTPS<input id="url-listagem" type="url" required placeholder="Página de provas ou link direto de PDF"></label><button type="submit">Buscar links de prova e gabarito</button><div id="links-descobertos"></div></form>
 <form id="criar-lote"><h3>1. Identifique a prova</h3><div class="grade">
 <label>ID do órgão<input name="orgao_id" id="cap-orgao-id" list="cap-orgaos" required placeholder="Ex.: N32"><datalist id="cap-orgaos"></datalist></label>
 <label>Órgão / instituição<input name="orgao" id="cap-orgao-nome" required maxlength="1000"></label>
@@ -42,7 +43,8 @@
 <label>Lote de destino<select id="lote-destino" name="lote" required></select></label>
 <div class="grade"><label>Tipo de documento<select id="tipo-documento" name="tipo"><option value="prova">Prova — questões</option><option value="gabarito">Gabarito</option><option value="retificacao">Retificação</option><option value="complemento">Complemento</option></select></label>
 <label id="campo-situacao" hidden>Situação do gabarito<select name="situacao_gabarito" id="situacao-gabarito"><option value="preliminar">Preliminar</option><option value="definitivo">Definitivo</option></select></label>
-<label>Origem do arquivo<select id="canal-material"><option value="upload">Enviar arquivo</option><option value="pasta">Arquivo da pasta de entrada</option></select></label>
+<label>Origem do arquivo<select id="canal-material"><option value="upload">Enviar arquivo</option><option value="pasta">Arquivo da pasta de entrada</option><option value="url">Baixar PDF por URL</option></select></label>
+<label id="campo-url" hidden>Link direto do PDF<input id="arquivo-url" type="url" placeholder="https://…/prova.pdf"></label>
 <label id="campo-upload">Arquivo (até 15 MiB)<input id="arquivo-material" type="file" accept=".pdf,.png,.jpg,.jpeg,.gif,.json,.jsonl,.html,.txt"></label>
 <label id="campo-pasta" hidden>Arquivo disponível<select id="arquivo-pasta"></select></label>
 <label>URL de origem (opcional)<input name="url_origem" maxlength="2000" placeholder="Registra a origem; não baixa o link"></label></div>
@@ -54,5 +56,6 @@
 <h3>Registro de provas</h3><p>Recepção, encaminhamento e análise são etapas distintas. Encaminhar exige prova e gabarito; não inicia a extração automaticamente.</p>
 <form id="filtros-protocolo"><div class="grade" id="campos-filtros-protocolo"></div><label>Palavra-chave<input id="busca-protocolo" placeholder="Prova, protocolo, cargo, edital…"></label><button type="reset" class="secundario">Limpar filtros do registro</button></form>
 <p id="total-protocolos" aria-live="polite"></p><div id="lista-lotes"></div>
+<section id="resultado-digitalizacao" aria-label="Prévia da extração"></section>
 </section>
 </main><script src="/app.js"></script><script src="/captacao.js"></script></body></html>

@@ -1,6 +1,6 @@
 # Captador
 
-Recebe e preserva documentos antes da digitalização. Implementado em Python 3.10+, sem dependências externas. Entradas atuais: envio de arquivo e seleção de arquivo de uma pasta local. URLs podem ser registradas como procedência; download por URL e adaptadores de API ficam para uma etapa posterior.
+Recebe e preserva documentos antes da digitalização. Implementado em Python 3.10+, sem dependências externas. Entradas atuais: envio de arquivo e seleção de arquivo de uma pasta local. URLs diretas de PDF podem ser baixadas pelo Captador. Também há descoberta de pares em cartões de listagem HTML (testada no Qconcursos). Adaptadores de API continuam futuros.
 
 ## Usar na interface compartilhada
 
@@ -68,7 +68,7 @@ O Emissor utiliza essa CLI, sem importar código interno. Endpoints da interface
 
 ## Entrega e limites
 
-Os lotes são a entrada futura do Digitalizador. Nesta etapa, a prévia mostra documentos, hashes, vínculos, estado e pendências; não mostra questões extraídas. Extração de PDF/OCR, interpretação do gabarito e incorporação ao acervo ainda não foram implementadas. A interface informa isso e não oferece um botão de extração sem processamento real.
+Os lotes são a entrada do Digitalizador. A área de captação mostra documentos, hashes e vínculos; após processamento, a interface apresenta a prévia das questões extraídas. A extração ENAM/FGV Tipo 1 e a leitura do gabarito são executadas pelo Digitalizador. OCR e incorporação ao acervo ainda não foram implementados. A interface oferece processamento real do perfil suportado e apresenta suas pendências.
 
 Depois da digitalização, o número original e o caderno permitirão associar a resposta à questão. No formato definitivo, o gabarito fica na chave da questão em TEMA_md.json: por exemplo, `"12": {"gabarito": {"situacao":"definitivo","alternativas_corretas":[3],"rotulos_originais":["C"]}}`, além dos demais campos obrigatórios. A posição 3 significa terceira assertiva local, contada a partir de 1. Nenhuma resposta é inferida pelo Captador.
 
@@ -108,3 +108,11 @@ Histórico registra cadastro, documentos recebidos, encaminhamentos e análises 
 A CLI `registrar_analise` exige lote, encaminhamento atual, resultado (concluida/falha) e relatorio. A resposta exibe a análise atual e o histórico preserva as anteriores. O processamento não é rotulado automaticamente como concluído ao receber arquivos.
 
 Lotes v1 continuam legíveis e seus originais não são alterados, mas ficam bloqueados para envio. Use **Identificar lote antigo**, preencha os novos campos e salve; o comando `identificar` também aceita a identidade completa mais lote via entrada padrão. Ele reserva o protocolo e grava a versão 2, preservando UUID, arquivos e documentos. A versão do acervo do Organizador permanece 3; esta é apenas a evolução do contrato de captação.
+
+## URL e entrega para processamento local
+
+Na interface, use Buscar links de prova e gabarito para uma página HTML ou Baixar PDF por URL para um endereço direto. A descoberta não cria lotes nem presume identidade: selecione os documentos e registre os atributos da prova. Outros layouts de páginas podem não ser reconhecidos. Arquivo vazio, HTML no lugar de PDF ou resposta HTTP de erro não são recebidos como prova.
+
+A CLI descobrir recebe {"url":"https://…"}. anexar também aceita url em vez de entrada/conteudo_base64, mantendo nome, tipo e lote. O download aceita apenas HTTPS público, sem credenciais no endereço, limita tamanho e redirecionamentos e verifica cada destino. Respeita proxy HTTP confiável configurado no sistema para túnel HTTPS; credenciais do proxy não são registradas. Origem e URL final ficam no descritor. Download não interpreta o conteúdo como instrução.
+
+A operação pública entrega retorna apenas um pacote atual, completo e íntegro. registrar_extracao registra o resultado programático no histórico e no estado do lote; não equivale a registrar_analise manual. Novos documentos invalidam o encaminhamento e a extração atuais. Essas operações são usadas pelo Digitalizador, e não expostas como edição arbitrária da base definitiva.

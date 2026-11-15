@@ -15,6 +15,11 @@ def main():
     sub = parser.add_subparsers(dest="comando", required=True)
     sub.add_parser("validar")
     sub.add_parser("catalogos")
+    sub.add_parser('descrever-candidatos', help='recebe lista JSON pela entrada padrão e aplica regras locais')
+    descrever_questao = sub.add_parser('descrever-questao', help='descritor por regras locais, sem IA')
+    descrever_questao.add_argument('id')
+    descrever_questao.add_argument('--salvar', action='store_true')
+    descrever_questao.add_argument('--substituir', action='store_true')
     preparar_abordagem = sub.add_parser('preparar-abordagem')
     preparar_abordagem.add_argument('id')
     registrar_abordagens = sub.add_parser('registrar-abordagens')
@@ -43,6 +48,21 @@ def main():
             resultado = base.validar()
         elif args.comando == "catalogos":
             resultado = base.catalogos
+        elif args.comando == 'descrever-candidatos':
+            from .descritores import descrever
+            entrada = json.load(sys.stdin)
+            if not isinstance(entrada, list):
+                raise Erro('fornecer lista de candidatos')
+            resultado = {'abordagens':[descrever(c) for c in entrada]}
+        elif args.comando == 'descrever-questao':
+            from .descritores import descrever
+            consulta = base.consultar(args.id)
+            meta = consulta['metadados'] or {}
+            q = consulta['questao']
+            resultado = descrever(dict(meta, enunciado=q[1], assertivas=q[2]))
+            if args.salvar:
+                tema, n = args.id.rsplit('.', 1)
+                registrar(base, tema, {n:resultado}, args.substituir)
         elif args.comando == 'preparar-abordagem':
             resultado = preparar(base, args.id)
         elif args.comando == 'registrar-abordagens':

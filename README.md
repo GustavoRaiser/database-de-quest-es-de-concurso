@@ -11,7 +11,7 @@ O objetivo é permitir que uma IA em CLI/harness compare os PDFs de estudo do us
 | [captador/](captador/README.md) | Captador | Recebe originais, organiza lotes e associa gabaritos | Implementado com interface no Emissor |
 | [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI e testes implementados; algumas funções de escrita ainda planejadas |
 | [emissor/](emissor/README.md) | Emissor | Visualização com filtros e API JSON para ferramentas próprias | Implementado |
-| [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | Estrutura e instruções preparadas; processamento ainda não implementado |
+| [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | Extrator local ENAM/FGV Tipo 1 implementado |
 
 ## Estrutura
 
@@ -75,7 +75,7 @@ Para iniciar qualquer trabalho, ler [AGENTS.md](AGENTS.md), [ARQUITETURA.md](ARQ
 
 ## Mudança de localização
 
-O conteúdo que antes ficava na raiz agora está em organizador/. Após atualizar seu clone, execute os comandos dentro dessa pasta. O formato dos dados continua na versão 3: esta reorganização não altera o conteúdo dos manifestos, registros, metadados ou recursos. O Digitalizador permanece sem código de processamento.
+O conteúdo que antes ficava na raiz agora está em organizador/. Após atualizar seu clone, execute os comandos dentro dessa pasta. O formato dos dados continua na versão 3: esta reorganização não altera o conteúdo dos manifestos, registros, metadados ou recursos. O Digitalizador possui extrator do perfil ENAM/FGV Tipo 1.
 
 ## Visualizar questões
 
@@ -89,10 +89,21 @@ Abra http://127.0.0.1:8000. Para consultar o acervo real, use `--base organizado
 
 ## Receber provas e gabaritos
 
-No mesmo servidor local, abra **Adicionar material**. Crie um lote por prova/edição/caderno, adicione a prova e depois seus gabaritos e retificações. Também é possível selecionar arquivos colocados em captador/trabalho/entrada/. Veja o [Captador](captador/README.md). A prévia atual mostra documentos e pendências; a extração de questões pelo Digitalizador ainda será implementada.
+No mesmo servidor local, abra **Adicionar material**. Crie um lote por prova/edição/caderno, adicione a prova e depois seus gabaritos e retificações. Também é possível selecionar arquivos colocados em captador/trabalho/entrada/. Veja o [Captador](captador/README.md). A prévia permite acompanhar os documentos e processar o perfil ENAM/FGV Tipo 1, com pendências explícitas.
 
-O Captador também mantém protocolos órgão.cargo.prova e um registro filtrável com banca, ano e outros atributos da prova. Só há encaminhamento ao Digitalizador com prova e gabarito vinculados e íntegros; a extração continua como próxima etapa.
+O Captador também mantém protocolos órgão.cargo.prova e um registro filtrável com banca, ano e outros atributos da prova. Só há encaminhamento ao Digitalizador com prova e gabarito vinculados e íntegros; a extração ENAM/FGV Tipo 1 já pode ser executada no host.
 
 ## Preparação para comparação de questões
 
-A [abordagem da cobrança](organizador/ABORDAGEM.md) prepara tarefas para IA em CLI/harness e registra perfis fundamentados nos metadados. O Emissor os apresenta junto da questão. A [avaliação do fluxo de PDF](digitalizador/AVALIACAO_PDF.md) distingue a recepção já funcional da extração ainda pendente. URLs de origem ainda não são baixadas automaticamente pelo Captador.
+A [abordagem da cobrança](organizador/ABORDAGEM.md) usa regras locais para gerar descritores e registra suas evidências. O Emissor apresenta os resultados e suas limitações. O [teste integrado](digitalizador/TESTE_PIPELINE_SEM_IA.md) demonstra URL → download → extração ENAM/FGV Tipo 1 → JSON intermediário, por programas no host.
+
+## Pipeline sem IA
+
+Na raiz:
+
+```sh
+python -m pip install -r digitalizador/requirements.txt
+python emissor/servidor.py --base organizador/exemplos/base
+```
+
+Em Adicionar material: localizar links ou enviar PDFs, identificar o lote, receber prova e gabarito, encaminhar e processar. O host extrai o perfil ENAM/FGV Tipo 1, associa respostas e gera descritores por regras locais. Nenhum modelo é chamado. A prévia tem download JSON e pendências explícitas; não há incorporação automática ao acervo. Veja [Digitalizador](digitalizador/README.md).

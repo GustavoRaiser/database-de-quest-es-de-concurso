@@ -90,3 +90,7 @@ Anulada e desatualizada continuam sendo situações das questões, a última inf
 5. Disponibilizar consultas e relatórios reproduzíveis para CLI/harness, com evidências e parâmetros de análise.
 
 Todas essas etapas são recomendações de planejamento. Não implementar automaticamente esta lista apenas porque uma IA leu o objetivo: respeitar o escopo da tarefa em curso. Neste registro foram alteradas somente a documentação de objetivo e suas referências de navegação/instruções.
+
+## Diretriz operacional atualizada — processamento sem IA
+
+O usuário definiu que o processamento dos dados deve ocorrer por programas no servidor/host/computador, sem chamadas a IA. A IA em CLI/harness é uma possível consumidora posterior do acervo e uma auxiliar de desenvolvimento. A operação atual usa extração de PDF, regras configuradas e cálculos determinísticos. Não apresentar descritores lexicais como conhecimento exigido inferido semanticamente. Preservar Não identificado e pendências quando a regra não oferecer evidência suficiente.

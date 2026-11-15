@@ -1,3 +1,26 @@
+# Operação atual: descritores por regras, sem IA
+
+A partir da decisão do usuário, o fluxo padrão executa no host e não chama IA. Os comandos de tarefas para harness descritos historicamente abaixo são legados opcionais; não são usados pelo Digitalizador.
+
+Na pasta organizador/:
+
+```sh
+python -m basequestoes --base exemplos/base descrever-questao N32.a2.5.y.1
+python -m basequestoes --base exemplos/base descrever-questao N32.a2.5.y.1 --salvar
+```
+
+--salvar exige metadados de origem já existentes. --substituir preserva a descrição anterior no histórico. O campo geracao aceita regras, além de ia/humano para leitura e compatibilidade dos registros anteriores.
+
+A CLI descrever-candidatos recebe uma lista JSON pela entrada padrão e retorna abordagens, uma por candidato. Cada candidato contém enunciado e listas opcionais assertivas/textos_apoio/recursos. Essa é a interface usada pelo Digitalizador, sem importar implementações internas.
+
+O vocabulário em basequestoes/regras.json é inicial, pequeno e auditável. Comparações ignoram caixa e acentos e respeitam limites de palavras. São registradas as regras acionadas, evidências literais, versão e hash da configuração. Raciocínio só recebe um rótulo quando um comando textual conhecido é reconhecido; nos demais casos é indeterminado. Sem correspondência retorna Não identificado. O campo conteudo_exigido explicita que não houve determinação semântica.
+
+Ocorrência lexical em uma alternativa pode ser um distrator. Não usar o perfil como prova de equivalência nem como classificação temática confirmada. O perfil registra pendências e é mostrado como proposta. Não há modelo embutido, custo de API, resposta correta inferida ou atualização jurídica automática.
+
+---
+
+## Histórico do contrato de perfis e modo harness
+
 # Abordagem da cobrança — critério 1
 
 Etapa do Organizador que prepara uma análise por IA/harness e registra o que cada questão exige. O registro permanece em TEMA_md.json, na chave da questão, sob abordagem. A linha JSONL e o ID permanecem iguais. A extensão é opcional e compatível com as bases no formato 3 existentes.

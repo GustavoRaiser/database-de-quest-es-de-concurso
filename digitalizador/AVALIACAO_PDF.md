@@ -1,5 +1,7 @@
 # Avaliação: é possível processar um PDF enviado pela interface?
 
+**Registro histórico:** esta avaliação antecede o extrator integrado. O estado operacional atual está em [README.md](README.md) e [TESTE_PIPELINE_SEM_IA.md](TESTE_PIPELINE_SEM_IA.md). O processamento ENAM/FGV Tipo 1 agora é executado por código no host, sem IA.
+
 Avaliação do repositório após a implementação da abordagem da cobrança. A conclusão distingue os passos executáveis hoje dos ainda pendentes.
 
 Atualização de 15/11/2026: consulte o [teste real do ENAM 2026.1](TESTE_ENAM_2026_1.md). Ele complementa a avaliação abaixo com documentos reais e extração experimental externa, sem converter o diagnóstico em ferramenta do repositório.
