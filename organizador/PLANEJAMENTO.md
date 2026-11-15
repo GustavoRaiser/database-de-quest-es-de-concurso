@@ -4,7 +4,7 @@
 
 Formato 3, exemplos e CLI em Python implementados. Já existem leitura, validação, consulta com metadados, armazenamento de recursos por hash, registro de metadados e registro de lotes de questões existentes. A base principal continua vazia.
 
-Ainda não há extrator de PDF, adaptador da Quest API, conversor/sanitizador de HTML, cadastro de categorias, inclusão de questões ou atualização de situação por comando. O registro de lote não faz essas importações.
+O Digitalizador já possui extrator ENAM/FGV Tipo 1. Reserva de identidade e inclusão de extrações v2 pelo Organizador estão implementadas. Adaptador da Quest API, conversor/sanitizador de HTML e atualização genérica de situação permanecem futuros. O registro de lote não faz essas importações.
 
 ## Etapa 1 — Preparar ambiente e fixar o contrato
 
@@ -98,3 +98,7 @@ Não ordenar nem formatar automaticamente arquivos JSONL. Não resolver conflito
 Leitor, validador, cadastro, inclusão, consulta, atualização de situação e reconstrução do índice, com verificações de preservação de linhas e gravação segura. Não é necessário construir uma interface web para começar.
 
 Implementada a preparação de abordagem via tarefa para IA/harness e o registro validado de perfis com evidências, hash, autoria e histórico. Os comandos preparar-abordagem e registrar-abordagens são executáveis. O modelo é executado pelo harness; scores e agrupamentos permanecem futuros.
+
+## Atualização de implementação
+
+Etapas de cadastro e inclusão já executáveis para o contrato de extração v2, com fichas duráveis de prova, recursos, publicação transacional e recuperação. Ver INCORPORACAO.md. Não são ainda comandos genéricos de edição/cadastro livre nem fusão de bases independentes.

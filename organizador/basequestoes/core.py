@@ -119,6 +119,8 @@ def registro(valor):
 class Base:
     def __init__(self, raiz):
         self.raiz = Path(raiz).resolve()
+        self.revisao = self._revisao()
+        self.conferir_leitura()
         self.manifesto = ler_json(self.raiz / "manifesto.json")
         esperado = {
             "formato": "base-questoes", "versao": 3, "codificacao": "UTF-8",
@@ -140,6 +142,15 @@ class Base:
         self.indice = ler_json(self.raiz / "indice.json")
         exigir(isinstance(self.indice, dict) and isinstance(self.indice.get("temas"), dict), "índice inválido")
 
+    def _revisao(self):
+        p = self.raiz / '.revisao.json'
+        return p.read_bytes() if p.exists() else b''
+
+    def conferir_leitura(self):
+        exigir(not (self.raiz / '.transacao-pendente.json').exists(),
+               'incorporação interrompida/em andamento; executar recuperar antes de consultar')
+        exigir(self._revisao() == self.revisao, 'base mudou durante a leitura; repetir comando')
+
     def local(self, relativo):
         exigir(isinstance(relativo, str) and relativo and "\\" not in relativo,
                "caminho relativo inválido")
@@ -159,6 +170,7 @@ class Base:
             raise Erro("base em gravação; se houve interrupção, verificar antes de remover .base.lock") from exc
         try:
             os.close(fd)
+            self.conferir_leitura()
             yield
         finally:
             caminho.unlink()
@@ -205,6 +217,13 @@ class Base:
                 self.recurso(origem["documento"])
             if "pagina" in origem:
                 exigir(type(origem["pagina"]) is int and origem["pagina"] > 0, "página inválida")
+            if 'ficha_prova' in origem:
+                referencia = origem['ficha_prova']
+                exigir(isinstance(referencia, str) and re.fullmatch(r'provas/[0-9A-Za-z]+/[0-9A-Za-z]+/[a-f0-9]{64}\.json', referencia), 'ficha de prova inválida')
+                ficha = ler_json(self.local(referencia))
+                exigir(ficha['grupo'] == '.'.join(tema.split('.')[:2]), 'ficha pertence a outro órgão/cargo')
+                for documento in ficha['documentos']:
+                    self.recurso(documento)
         if "gabarito" in item:
             g = item["gabarito"]
             exigir(isinstance(g, dict), "gabarito inválido")
@@ -364,6 +383,7 @@ class Base:
                     exigir(".".join(partes[:-1]) in self.catalogos[grupos[nivel-2]], f"categoria sem pai: {chave}")
         exigir(set(self.indice["temas"]) == set(self.catalogos["temas"]), "índice diverge dos temas cadastrados")
         quantidade, metas = 0, 0
+        metadados_validos = {}
         previstos = set()
         for tema, caminho in self.indice["temas"].items():
             exigir(caminho == caminho_tema(tema, "dados"), f"caminho inválido: {tema}")
@@ -374,7 +394,8 @@ class Base:
                 except Erro as exc:
                     raise Erro(f"{caminho}:{n}: {exc}") from exc
                 quantidade += 1
-            metas += len(self.metadados(tema))
+            metadados_validos[tema] = self.metadados(tema)
+            metas += len(metadados_validos[tema])
         encontrados = {p.resolve() for p in self.local("dados").rglob("*.jsonl")}
         exigir(encontrados == previstos, "há arquivos de questões sem índice")
         for p in self.local("dados").rglob("*_md.json"):
@@ -396,4 +417,29 @@ class Base:
             exigir(fingerprint not in fingerprints, "lote duplicado")
             fingerprints.add(fingerprint)
             lotes += 1
+        for path in self.local('provas').glob('*/*/*.json'):
+            ficha = ler_json(path)
+            partes = path.relative_to(self.local('provas')).parts
+            grupo = '.'.join(partes[:2])
+            exigir(ficha.get('versao') == 1 and ficha.get('grupo') == grupo and grupo in self.catalogos['cargos'], 'ficha de prova incompatível')
+            exigir(path.stem == ficha.get('prova_sha256'), 'hash da prova diverge da ficha')
+            exigir(isinstance(ficha.get('identificacao'),dict) and ficha['identificacao'].get('orgao_id') == partes[0]
+                   and ficha['identificacao'].get('cargo_id') == partes[1], 'identificação da ficha divergente')
+            exigir(isinstance(ficha.get('documentos'),list) and len(ficha['documentos']) == 2, 'documentos da ficha inválidos')
+            for documento in ficha['documentos']:
+                self.recurso(documento)
+            exigir({d.get('tipo'):d['sha256'] for d in ficha['documentos']} ==
+                   {'prova':ficha['prova_sha256'],'gabarito':ficha.get('gabarito_sha256')}, 'documentos e hashes da ficha divergem')
+            originais, destinos = set(), set()
+            exigir(isinstance(ficha.get('mapeamento'),list) and ficha['mapeamento'], 'mapeamento da ficha obrigatório')
+            for item in ficha['mapeamento']:
+                numero, id_ = item.get('numero_original'),item.get('questao_id')
+                exigir(texto(numero) and texto(id_) and id_.startswith(grupo+'.'), 'mapeamento da ficha inválido')
+                self.questao(id_)
+                exigir(numero not in originais and id_ not in destinos, 'mapeamento repetido na ficha')
+                originais.add(numero);destinos.add(id_)
+                tema, linha = id_.rsplit('.',1)
+                meta = metadados_validos[tema].get(linha,{})
+                exigir(any(o.get('ficha_prova') == path.relative_to(self.raiz).as_posix()
+                           and o.get('numero_original') == numero for o in meta.get('origens',[])), 'origem não corresponde à ficha')
         return {"temas": len(previstos), "questoes": quantidade, "metadados": metas, "lotes": lotes}

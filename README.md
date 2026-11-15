@@ -9,9 +9,9 @@ O objetivo é permitir que uma IA em CLI/harness compare os PDFs de estudo do us
 | Pasta | Agente | Responsabilidade | Estado |
 |---|---|---|---|
 | [captador/](captador/README.md) | Captador | Recebe originais, organiza lotes e associa gabaritos | Implementado com interface no Emissor |
-| [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI e testes implementados; algumas funções de escrita ainda planejadas |
+| [organizador/](organizador/README.md) | Organizador | Formato, armazenamento, metadados, integridade e consulta da base | CLI, incorporação transacional de extrações e testes implementados |
 | [emissor/](emissor/README.md) | Emissor | Visualização com filtros e API JSON para ferramentas próprias | Implementado |
-| [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | Extrator local ENAM/FGV Tipo 1 implementado |
+| [digitalizador/](digitalizador/README.md) | Digitalizador | Transformar PDF, imagem ou conteúdo estruturado em material extraído, com procedência e pendências | ENAM/FGV Tipo 1; pipeline desktop/harness e GitHub Actions |
 
 ## Estrutura
 
@@ -106,4 +106,8 @@ python -m pip install -r digitalizador/requirements.txt
 python emissor/servidor.py --base organizador/exemplos/base
 ```
 
-Em Adicionar material: localizar links ou enviar PDFs, identificar o lote, receber prova e gabarito, encaminhar e processar. O host extrai o perfil ENAM/FGV Tipo 1, associa respostas e gera descritores por regras locais. Nenhum modelo é chamado. A prévia tem download JSON e pendências explícitas; não há incorporação automática ao acervo. Veja [Digitalizador](digitalizador/README.md).
+Em Adicionar material: localizar links ou enviar PDFs, identificar o lote, receber prova e gabarito, encaminhar e processar. O host extrai o perfil ENAM/FGV Tipo 1, associa respostas e gera descritores por regras locais. Nenhum modelo é chamado. A prévia da interface continua intermediária. O comando `python digitalizador/pipeline.py --url URL` executa a cadeia até a incorporação pelo Organizador. Veja [Digitalizador](digitalizador/README.md).
+
+## Execução no GitHub ou no desktop
+
+Ver [operação portátil](digitalizador/OPERACAO.md). No PC, uma pasta com pares `NOME_cad.pdf` e `NOME_gab.pdf` ou uma URL inicia a cadeia. No GitHub, **Actions → Captar e digitalizar provas → Run workflow** recebe a URL/pasta e disponibiliza a base, originais e relatórios no artefato `acervo-processado` (30 dias). O processamento inteiro ocorre naquele ambiente. Continuação de artefato anterior é explícita; não existe sincronização automática entre GitHub e PC. Perfil de extração atual: ENAM/FGV Tipo 1, PDF textual.

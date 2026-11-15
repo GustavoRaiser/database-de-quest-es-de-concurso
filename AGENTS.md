@@ -60,3 +60,11 @@ Guiar a evolução por OBJETIVO.md: permitir que IA em CLI/harness compare tópi
 ## Execução sem IA
 
 Por decisão do usuário, download, extração, associação de gabarito, descritores e cálculos são executados por código no servidor/host/computador. Não introduzir chamadas a modelos na operação. IA pode ajudar a desenvolver as ferramentas e consumir resultados posteriormente. Regras lexicais não equivalem a interpretação semântica: rotular limitações e retornar Não identificado quando não houver correspondência. O extrator atual suporta apenas o perfil ENAM/FGV Tipo 1 documentado no Digitalizador.
+
+## Harness, arquivos e ambiente de execução
+
+Ao receber URLs de provas para processamento, usar `python digitalizador/pipeline.py --url URL` (repetir --url para várias páginas), ou --pedido para URLs diretas e identificação. Para pares locais usar --pasta. Ler [digitalizador/OPERACAO.md](digitalizador/OPERACAO.md). Não extrair questões manualmente com IA como substituto do programa. Relatar reservas e falhas por item; não declarar a cadeia completa quando o relatório registra pendências.
+
+Executar no ambiente receptor: GitHub Actions para captação no GitHub, CLI local para desktop. Originais e base ficam nesse ambiente; transferência/continuação de artefatos é explícita. Não publicar PDFs/base real no Git automaticamente. A cópia do acervo no artefato do workflow é o resultado do processamento no GitHub, com retenção documentada. Não existe serviço permanente rodando apenas pela existência do repositório.
+
+Incorporação é responsabilidade exclusiva do Organizador via CLI pública. IDs por linha são preservados; mesmo PDF no mesmo órgão/cargo não duplica questões. Não remover marcadores ou arquivos de transação pendente para liberar leitura: usar recuperar. Tema Não classificado e descritores propostos não equivalem a classificação semântica confirmada.

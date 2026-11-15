@@ -1,0 +1,71 @@
+name: Captar e digitalizar provas
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'URL Qconcursos ou URLs de páginas, uma por linha; vazio usa pasta'
+        required: false
+        type: string
+      pasta:
+        description: 'Pasta do repositório com NOME_cad.pdf e NOME_gab.pdf'
+        default: captador/entrada
+        type: string
+      identificacao:
+        description: 'Identificação JSON opcional para complementar nomes/ano/edição/caderno'
+        required: false
+        type: string
+      situacao_gabarito:
+        description: 'Automático só reconhece hashes conferidos; declarar outros gabaritos'
+        default: automatico
+        type: choice
+        options: [automatico, preliminar, definitivo]
+      situacao_inicial:
+        description: 'Situação declarada no cadastro: 0 atualizada, 1 desatualizada; anuladas vêm da fonte'
+        default: '0'
+        type: choice
+        options: ['0', '1']
+      continuar_execucao:
+        description: 'ID de execução anterior cujo artefato deve ser continuado; vazio parte da base versionada'
+        required: false
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: captacao-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  processar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r digitalizador/requirements.txt
+      - name: Retomar artefato anterior
+        if: inputs.continuar_execucao != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: acervo-processado
+          path: digitalizador/trabalho/github
+          run-id: ${{ inputs.continuar_execucao }}
+          github-token: ${{ github.token }}
+      - name: Executar cadeia neste runner
+        env:
+          FONTE_URL: ${{ inputs.urls }}
+          PASTA_ENTRADA: ${{ inputs.pasta }}
+          IDENTIFICACAO: ${{ inputs.identificacao }}
+          SITUACAO_GABARITO: ${{ inputs.situacao_gabarito }}
+          SITUACAO_INICIAL: ${{ inputs.situacao_inicial }}
+        run: python digitalizador/executar_github.py
+      - name: Reservar originais, relatórios e base neste ambiente
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acervo-processado
+          path: digitalizador/trabalho/github
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

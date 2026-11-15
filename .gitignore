@@ -4,3 +4,8 @@ __pycache__/
 *.tmp
 /captador/trabalho/
 /digitalizador/trabalho/
+/organizador/trabalho/
+/captador/entrada/*.pdf
+.transacoes/
+.transacao-pendente.json
+.revisao.json

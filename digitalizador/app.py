@@ -9,6 +9,7 @@ import subprocess
 import sys
 import os
 import tempfile
+import io
 
 ROOT = Path(__file__).resolve().parents[1]
 DISCIPLINAS = {'DIREITO CONSTITUCIONAL', 'DIREITO ADMINISTRATIVO', 'DIREITO CIVIL',
@@ -135,6 +136,36 @@ def processar(captacoes, lote, saida, base):
         caminhos.append(path)
     exigir(pacote['identificacao']['ano'] == pacote['identificacao']['edicao'][:4], 'Ano e edição do lote divergem')
     qs, visuais = extrair(*caminhos, edicao=pacote['identificacao']['edicao'])
+    saida = Path(saida).resolve()
+    saida.mkdir(parents=True, exist_ok=True)
+    paginas_originais = {}
+    if visuais:
+        import pdfplumber
+        with pdfplumber.open(caminhos[0]) as pdf:
+            for numero in visuais:
+                imagem = pdf.pages[numero-1].to_image(resolution=120).original
+                buffer = io.BytesIO()
+                imagem.save(buffer, format='PNG')
+                raw = buffer.getvalue()
+                digest = hashlib.sha256(raw).hexdigest()
+                relativo = f'recursos/{digest[:2]}/{digest}'
+                path = saida/relativo
+                path.parent.mkdir(parents=True, exist_ok=True)
+                if path.exists():
+                    exigir(path.read_bytes() == raw, 'Imagem de página existente corrompida')
+                else:
+                    fd, temporario = tempfile.mkstemp(dir=path.parent,suffix='.tmp')
+                    try:
+                        with os.fdopen(fd,'wb') as f:
+                            f.write(raw);f.flush();os.fsync(f.fileno())
+                        os.replace(temporario,path)
+                    finally:
+                        if os.path.exists(temporario):os.unlink(temporario)
+                paginas_originais[numero] = {'arquivo':relativo,'sha256':digest,'tipo_mime':'image/png',
+                    'posicao':'original','ordem':numero,'pagina':numero,
+                    'descricao':f'Página {numero} integral do caderno; representação original para conferência'}
+    for q in qs:
+        q['recursos'] = [paginas_originais[n] for n in q['referencias_visuais']]
     descritores = cli([sys.executable, '-m', 'basequestoes', '--base', str(Path(base).resolve()), 'descrever-candidatos'], qs,
                       cwd=ROOT/'organizador')['abordagens']
     exigir(len(descritores) == len(qs), 'Quantidade de descritores diverge das questões')
@@ -144,12 +175,13 @@ def processar(captacoes, lote, saida, base):
             q['gabarito']['situacao'] = pacote['gabarito']['situacao_gabarito']
     pendencias = ['Descritores lexicais não confirmam tema ou conhecimento exigido semanticamente.']
     if visuais:
-        pendencias.append('Elementos visuais/vetoriais pendentes de representação: páginas '+', '.join(map(str,visuais)))
+        pendencias.append('Elementos visuais preservados nas páginas integrais em PNG e no PDF; não posicionados dentro do texto de cada questão.')
     if pacote['complementos']:
         pendencias.append('Retificações/complementos recebidos ainda não interpretados automaticamente')
-    resultado = {'versao':1,'extrator':'enam_fgv/1','encaminhamento':entrega['id'], 'protocolo':pacote['protocolo'],
+    resultado = {'versao':2,'extrator':'enam_fgv/2','encaminhamento':entrega['id'], 'protocolo':pacote['protocolo'],
                  'identificacao':pacote['identificacao'], 'documentos':pacote,
                  'estado':'extraido_com_pendencias', 'pendencias':pendencias,
+                 'bloqueios':['Retificações/complementos ainda não interpretados'] if pacote['complementos'] else [],
                  'contagens':{'questoes':len(qs),'assertivas':sum(len(q['assertivas']) for q in qs),
                               'anuladas':[q['numero_original'] for q in qs if q['gabarito']['situacao']=='anulado']},
                  'dependencias':{n:importlib.metadata.version(n) for n in ('pdfplumber','pypdf')}, 'questoes':qs}

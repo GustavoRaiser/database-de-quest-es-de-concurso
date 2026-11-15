@@ -134,4 +134,5 @@ def descobrir(url):
     parser.feed(raw.decode('utf-8', errors='replace'))
     itens = [i for i in parser.itens if i['prova_url'] or i['gabarito_url']]
     return {'pdf_direto': False, 'origem': origem, 'candidatos': itens,
+            'adaptador': 'qconcursos' if urlsplit(origem['url_final']).hostname in ('www.qconcursos.com','qconcursos.com') else 'links_rotulados',
             'aviso': 'Selecione e confira prova/caderno; nenhuma associação ou identidade é presumida.'}

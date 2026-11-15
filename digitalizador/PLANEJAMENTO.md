@@ -1,7 +1,7 @@
 # Estado do Digitalizador
 
-Implementado: extrator de PDF ENAM/FGV Tipo 1 (80 questões), gabarito correspondente, referências de páginas/disciplinas, descritores lexicais locais e prévia JSON na interface. Execução por programas no host, sem chamadas a modelos de IA. Dependências e comandos em README.md.
+Implementados: ENAM/FGV Tipo 1 textual, 80 questões; gabarito correspondente; páginas/disciplinas; preservação de páginas visuais em PNG; descritores lexicais; prévia na interface; pipeline CLI e workflow GitHub Actions. Operação por programas no ambiente que recebe os documentos, sem modelos.
 
-A entrada exige pacote atual completo do Captador. A extração programática é registrada separadamente da análise manual. Nenhuma questão é incorporada automaticamente ao Organizador.
+O pipeline coordena CLIs públicas até a incorporação pelo Organizador. Entrada por página Qconcursos, URLs diretas associadas ou pasta com pares _cad/_gab. Captador preserva reservas incompletas/não suportadas. O acervo definitivo recebe apenas extrações sem bloqueios técnicos; temas não determinados ficam Não classificado, com avisos preservados.
 
-Próximas etapas: suporte a outros layouts e cadernos, representação de elementos visuais e tabelas, OCR, regras temáticas mais completas e incorporação controlada ao acervo. O Compilador e a análise de PDFs de estudo são trabalhos próprios futuros.
+Próximas etapas: outros layouts/cadernos, OCR, posicionamento de figuras/tabelas no texto, versões de gabarito já incorporado e classificação temática. Compilador e análise de PDFs de estudo permanecem separados e futuros. Ver [operação](OPERACAO.md).

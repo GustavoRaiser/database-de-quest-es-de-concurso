@@ -1,6 +1,10 @@
 # Digitalizador
 
-Extrator local executado por código, sem modelos de IA. Primeiro perfil suportado: **ENAM/FGV Tipo 1**, 80 questões A–E, PDF com texto e gabarito no layout documentado. A extração gera candidatos para consulta e validação; ainda não incorpora questões ao acervo definitivo.
+Extrator local executado por código, sem modelos de IA. Primeiro perfil suportado: **ENAM/FGV Tipo 1**, 80 questões A–E, PDF com texto e gabarito no layout documentado. A extração gera candidatos; o pipeline já os entrega à CLI do Organizador para incorporação validada. Ver [operação em desktop, harness e GitHub Actions](OPERACAO.md).
+
+## Pipeline de uma entrada até a base
+
+Na raiz: `python digitalizador/pipeline.py --url URL` ou `python digitalizador/pipeline.py --pasta captador/entrada --situacao-gabarito definitivo` (a situação deve ser declarada conforme a fonte). O Captador reserva todos os pares da página/pasta; cada lote suportado segue até a incorporação. Uma prova incompleta ou não suportada permanece reservada, com diagnóstico. O workflow **Captar e digitalizar provas** executa a mesma cadeia no GitHub.
 
 ## Instalar e executar
 
@@ -28,7 +32,7 @@ O lote precisa ter sido encaminhado antes. Os comandos públicos do Captador rec
 
 ## Saída
 
-Ver [CONTRATO.md](CONTRATO.md). O JSON contém numeração e páginas originais, disciplina de cabeçalho, enunciado, alternativas, gabarito, descritores por regras e pendências. Arquivos ficam em digitalizador/trabalho/ (ignorados pelo Git). Configure --digitalizacoes no Emissor ou --saida na CLI para outro destino. Faça backup dessas pastas junto aos originais do Captador.
+Ver [CONTRATO.md](CONTRATO.md). Contrato intermediário v2. O JSON contém numeração e páginas originais, disciplina de cabeçalho, enunciado, alternativas, gabarito, descritores por regras e pendências. Arquivos ficam em digitalizador/trabalho/ (ignorados pelo Git). Configure --digitalizacoes no Emissor ou --saida na CLI para outro destino. Faça backup dessas pastas junto aos originais do Captador.
 
 Não há IA nesta operação. Os descritores são produzidos pela CLI pública do Organizador, com vocabulário local e regras auditáveis; eles não comprovam conhecimento exigido ou equivalência entre questões. O texto original permanece disponível para conferência.
 
@@ -36,10 +40,10 @@ Não há IA nesta operação. Os descritores são produzidos pela CLI pública d
 
 - Suporta o layout ENAM/FGV Tipo 1 implementado, não um leitor universal de provas.
 - Falha explícita para numeração/alternativas incompletas e PDFs sem texto. OCR não implementado.
-- Imagens e vetores no corpo são referenciados por página e geram pendências; não há reconstrução visual automática fiel.
+- Páginas com imagens/vetores são preservadas integralmente como PNG e no PDF original; posicionamento de figuras dentro do texto não é reconstruído.
 - Gabaritos de outros tipos não são misturados ao Tipo 1. Anulação depende da legenda reconhecida.
 - Retificações/complementos são preservados, mas ainda exigem interpretação separada.
-- Temas, score de semelhança, agrupamentos, processamento de apostilas e incorporação no acervo não foram automatizados.
+- Temas sem confirmação ficam em Não classificado. Score de semelhança, agrupamentos e processamento de apostilas continuam futuros.
 - A interface usa extraido_com_pendencias; não presume completude semântica nem atualidade jurídica.
 
 ## Verificar
@@ -49,3 +53,5 @@ python -m unittest discover -s digitalizador/tests -v
 ```
 
 Os testes usam PDFs sintéticos. O [teste real atualizado](TESTE_PIPELINE_SEM_IA.md) registra o resultado com o ENAM 2026.1. O [diagnóstico anterior](TESTE_ENAM_2026_1.md) permanece como histórico da etapa em que o extrator ainda não integrava o repositório.
+
+A [verificação portátil](TESTE_PORTATIL.md) registra a execução da URL até a base e os testes de repetição/recuperação.

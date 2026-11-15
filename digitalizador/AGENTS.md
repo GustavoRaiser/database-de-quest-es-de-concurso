@@ -26,3 +26,5 @@ A primeira implementação deve ter amostras e verificações para colunas, cabe
 ## Implementação atual
 
 Ler CONTRATO.md e README.md. Operação por código local, sem IA. Perfil ENAM/FGV Tipo 1 explicitamente limitado. Manter testes para pacote incompleto/obsoleto, caderno, ordem, continuidade, alternativas e gabarito. Elementos visuais não reconstruídos precisam de pendência, não de sucesso silencioso. Usar a CLI pública do Captador para entrega e a do Organizador para descritores.
+
+A CLI pipeline.py orquestra cada etapa pública até incorporar-extracao do Organizador. O adaptador executar_github.py só prepara o ambiente/artefato e chama o mesmo pipeline. Não mover código de recepção ou gravação para esses adaptadores. Contrato intermediário atual v2, com recursos e bloqueios técnicos explícitos.

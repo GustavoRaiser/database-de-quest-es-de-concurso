@@ -9,3 +9,7 @@ Próximas etapas: implementar o Digitalizador e seu contrato intermediário, lig
 Implementados no contrato v2: protocolos órgão.cargo.prova, filtros de registro inspirados nos filtros públicos de provas do Qconcursos, histórico documental, identificação de lotes antigos e fila de encaminhamentos. A fila só recebe prova e gabarito íntegros vinculados. A análise pode ser registrada manualmente com relatório, sem execução automática do Digitalizador.
 
 Implementados agora: download HTTPS de PDF, descoberta de links em listagem HTML, entrega validada ao Digitalizador e registro distinto de extração programática. Os itens anteriores que tratavam essas funções como futuras são históricos; OCR, API externa e monitoramento de pasta permanecem pendentes.
+
+## Atualização de implementação
+
+Recepção em lote por URL/pasta, reservas por par, convenção _cad/_gab, retomada e preparação/encaminhamento implementados. A cadeia CLI prossegue até o Organizador e roda também em GitHub Actions. Ver README e ../digitalizador/OPERACAO.md.

@@ -1,6 +1,6 @@
 # Contratos entre agentes
 
-Este documento define responsabilidades de entrega. Existe formato intermediário de extração em digitalizador/CONTRATO.md. A integração de incorporação definitiva ao Organizador continua planejada.
+Este documento define responsabilidades de entrega. Existe formato intermediário de extração em digitalizador/CONTRATO.md. A incorporação definitiva é executada pelo Organizador a partir da extração v2.
 
 ## 1. Fonte → Digitalizador
 
@@ -27,11 +27,11 @@ Artefatos de trabalho e saídas de extração pertencerão ao Digitalizador. O m
 
 ## 3. Entrega revisada → Organizador
 
-O Organizador confere integridade e compatibilidade com seu contrato. Uma futura inclusão definitiva exige categoria/tema e situação definidos, recursos necessários presentes e pendências relevantes resolvidas.
+O Organizador confere integridade e compatibilidade com seu contrato. A incorporação exige situação inicial declarada, categoria/tema (admite Não classificado), recursos preservados e nenhum bloqueio técnico. Avisos lexicais e de apresentação visual permanecem nos metadados/relatório.
 
 O Organizador atribui o ID local conforme a posição efetivamente gravada e produz o mapeamento origem → ID local. Depois registra os metadados no arquivo TEMA_md.json, guarda recursos em recursos/ e registra o lote em importacoes/.
 
-Hoje existem comandos para recursos, metadados e lotes de questões já existentes; não existe comando de inclusão de questões novas. O Digitalizador não deve simular essa função escrevendo diretamente em dados/.
+O comando incorporar-extracao inclui novas questões, metadados, fontes e fichas da prova. reservar-identidade cadastra órgão/cargo. Ambos usam publicação transacional validada e recuperável. O Digitalizador não deve simular essa função escrevendo diretamente em dados/.
 
 ## 4. Consulta
 
@@ -53,13 +53,13 @@ A desatualização é declarada pelo usuário. Não existe revisão jurídica ob
 
 Contrato de captação versão 2 documentado em captador/README.md. Entrada: arquivo enviado ou selecionado em entrada/. Saída: recebidos/ID/lote.json e originais preservados por hash, um lote por prova/caderno. Gabarito e retificação apontam ao hash da prova. A correspondência de caderno é declarada pelo usuário.
 
-O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar material apresenta estado e pendências; as gravações de recepção são no trabalho do Captador, e resultados intermediários pertencem ao trabalho do Digitalizador. O acervo definitivo permanece sob responsabilidade do Organizador. O Digitalizador extrai o perfil suportado e associa o gabarito pelo número original; o mapeamento para IDs definitivos ainda é futuro. O lote do Captador não é o registro de importação de questões concluídas do Organizador.
+O Emissor usa captador/app.py por subprocesso, sem shell. A área Adicionar material apresenta estado e pendências; as gravações de recepção são no trabalho do Captador, e resultados intermediários pertencem ao trabalho do Digitalizador. O acervo definitivo permanece sob responsabilidade do Organizador. O Digitalizador extrai o perfil suportado e associa o gabarito pelo número original; o Organizador produz o mapeamento para IDs definitivos na incorporação. O lote do Captador não é o registro de importação de questões concluídas do Organizador.
 
 ## 8. Registro e entrega protegida do Captador
 
 Protocolo ORGAO.CARGO.PROVA, com códigos iniciais compatíveis com o Organizador e terceiro segmento de prova exclusivo do Captador. O registro reside nos manifestos dos lotes, com banca, ano, escolaridade, áreas, localização, edição/caderno e histórico. A criação ou identificação verifica conflitos e duplicatas.
 
-Encaminhamento exige prova e gabarito íntegros, com vínculo validado novamente pela CLI. O usuário escolhe o gabarito, inclusive quando há versões preliminar/definitiva. O pacote v1 em encaminhamentos/HASH.json tem identificação, protocolo, descritores e referência relativa aos originais. Idempotência impede repetir o mesmo pacote. O futuro Digitalizador deve verificar se o pacote ainda é o encaminhamento atual do lote e conferir os hashes antes de consumir. Análise registrada manualmente exige encaminhamento e relatório e não equivale a execução automática. Sem ambos os documentos, não passa.
+Encaminhamento exige prova e gabarito íntegros, com vínculo validado novamente pela CLI. O usuário escolhe o gabarito, inclusive quando há versões preliminar/definitiva. O pacote v1 em encaminhamentos/HASH.json tem identificação, protocolo, descritores e referência relativa aos originais. Idempotência impede repetir o mesmo pacote. O Digitalizador verifica se o pacote ainda é o encaminhamento atual do lote e conferir os hashes antes de consumir. Análise registrada manualmente exige encaminhamento e relatório e não equivale a execução automática. Sem ambos os documentos, não passa.
 
 ## 9. Organizador → IA/harness → preparação do Compilador
 
@@ -67,4 +67,14 @@ preparar-abordagem retorna tarefa v1 com conteúdo completo, apoios, recursos, c
 
 ## 10. Operação atual sem IA
 
-A implementação vigente é executada por programas no host. Descoberta/download no Captador, entrega completa e validada, extração ENAM/FGV Tipo 1 no Digitalizador e descritores por regras no Organizador. O contrato intermediário v1 está em digitalizador/CONTRATO.md. A interface consome as CLIs públicas e apresenta a extração via POST /api/digitalizacao/processar. Não há importação definitiva ou agrupamento automatizado. Os modos históricos de tarefas para IA/harness não são dependências da operação atual.
+A implementação vigente é executada por programas no host. Descoberta/download no Captador, entrega completa e validada, extração ENAM/FGV Tipo 1 no Digitalizador e descritores por regras no Organizador. O contrato intermediário v2 está em digitalizador/CONTRATO.md. A interface consome as CLIs públicas e apresenta a extração via POST /api/digitalizacao/processar. O pipeline CLI chama a incorporação definitiva do Organizador; agrupamento não implementado. Os modos históricos de tarefas para IA/harness não são dependências da operação atual.
+
+## 11. Recepção em lote e operação portátil
+
+`captador/app.py receber` recebe JSON com urls (páginas ou pares de URLs com sufixos/padrão Qconcursos), prova_url/gabarito_url explícitos, ou pasta com pares NOME_cad.pdf/NOME_gab.pdf. Todos os links dos cartões da página informada são reservados em reservados/ID/, com registro.json e cópias _cad/_gab; páginas seguintes exigem suas próprias URLs. Nome comum é declaração do vínculo, não inferência de resposta. Recepção conserva pares incompletos sem encaminhar.
+
+`preparar-reserva` exige reserva completa, identificação e situação do gabarito; apenas hashes previamente conferidos dispensam declaração da situação. Reutiliza lotes compatíveis e chama encaminhar. O contrato do lote permanece v2 e o pacote de entrega v1. A convenção por arquivos não relaxa a conferência de caderno/numeração realizada pelo Digitalizador.
+
+`digitalizador/pipeline.py` chama CLIs públicas de cada agente e produz relatório por reserva; segue processando outros itens quando um deles fica pendente. Só o Organizador escreve dados/. `incorporar-extracao` recebe resultado, captacoes e situacao_inicial por JSON stdin. Confere resultado v2 e entrega atual, preserva PDFs/recursos, cria ficha em provas/ORGAO/CARGO/SHA_PROVA.json e retorna mapeamento. Mesmo PDF no mesmo órgão/cargo é idempotente; gabarito diferente bloqueia atualização automática. A ficha é o vínculo durável; protocolo do Captador é local ao ambiente, não chave global entre computadores.
+
+O workflow executa a mesma cadeia em runner do GitHub; preserva tudo em artefato, sem commit automático. Desktop guarda localmente. Continuar artefato anterior é explícito. Não há chamadas a modelos ou sincronização implícita entre os ambientes. Ver digitalizador/OPERACAO.md.

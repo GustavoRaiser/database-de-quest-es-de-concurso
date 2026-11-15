@@ -215,6 +215,20 @@ class Captador:
             exigir(p.stat().st_size <= LIMITE, "Arquivo excede 15 MiB")
             conteudo = p.read_bytes()
             canal = "pasta"
+        elif 'reserva' in dados:
+            reserva = dados['reserva']
+            exigir(isinstance(reserva,str) and re.fullmatch('[a-f0-9]{64}',reserva), 'Reserva inválida')
+            pasta = (self.raiz/'reservados'/reserva).resolve()
+            exigir(pasta.is_relative_to(self.raiz), 'Reserva fora da captação')
+            registro = json.loads((pasta/'registro.json').read_text(encoding='utf-8'))
+            d = registro['documentos'][tipo]
+            p = (pasta/d['arquivo']).resolve()
+            exigir(p.is_relative_to(pasta) and p.stat().st_size <= LIMITE, 'Arquivo reservado inválido')
+            conteudo = p.read_bytes()
+            exigir(hashlib.sha256(conteudo).hexdigest() == d['sha256'], 'Reserva corrompida')
+            canal = registro['canal']
+            dados = dict(dados,url_origem=d.get('url_origem',''))
+            rede = d.get('download')
         else:
             valor = dados.get("conteudo_base64", "")
             exigir(isinstance(valor, str) and len(valor) <= LIMITE * 4 // 3 + 4, "Arquivo excede 15 MiB")
@@ -336,18 +350,28 @@ class Captador:
                     erros.append({"lote": p.name, "erro": str(e)})
         entrada = [{"nome": p.name, "tamanho": p.stat().st_size} for p in sorted((self.raiz / "entrada").iterdir())
                    if p.is_file() and not p.is_symlink() and p.suffix.lower() in EXTENSOES]
-        return {"lotes": lotes, "entrada": entrada, "erros": erros}
+        reservas = []
+        for p in sorted((self.raiz/'reservados').glob('*/registro.json')):
+            try:
+                exigir(p.resolve().is_relative_to(self.raiz), 'Reserva fora da captação')
+                reservas.append(json.loads(p.read_text(encoding='utf-8')))
+            except (OSError,ValueError) as exc:
+                erros.append({'reserva':p.parent.name,'erro':str(exc)})
+        return {"lotes": lotes, "entrada": entrada, "erros": erros, 'reservas':reservas}
 
 
 def main():
     parser = argparse.ArgumentParser(description="Captador de materiais originais")
     parser.add_argument('--raiz', type=Path, default=Path(__file__).parent / 'trabalho')
     parser.add_argument('--catalogos', type=Path, help='catálogos do Organizador para conferir códigos existentes')
-    parser.add_argument('comando', choices=['estado', 'criar', 'anexar', 'identificar', 'encaminhar', 'registrar_analise', 'descobrir', 'entrega', 'registrar_extracao'])
+    parser.add_argument('comando', choices=['estado', 'criar', 'anexar', 'identificar', 'encaminhar', 'registrar_analise', 'descobrir', 'entrega', 'registrar_extracao', 'receber', 'preparar-reserva'])
     args = parser.parse_args()
     try:
         c = Captador(args.raiz, args.catalogos)
-        if args.comando == 'descobrir':
+        if args.comando in ('receber','preparar-reserva'):
+            from recepcao import receber, preparar
+            resposta = (receber if args.comando == 'receber' else preparar)(c,json.load(sys.stdin))
+        elif args.comando == 'descobrir':
             from rede import descobrir
             resposta = descobrir(json.load(sys.stdin)['url'])
         else:

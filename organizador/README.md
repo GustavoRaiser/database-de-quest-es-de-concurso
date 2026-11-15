@@ -84,7 +84,7 @@ A migração altera os manifestos; não altera as linhas das questões. O índic
 
 O Organizador é responsável pelo formato, armazenamento, referências, integridade e consulta da base. Código, testes, exemplos e instruções específicos ficam nesta pasta. Leia também [AGENTS.md](AGENTS.md), a [arquitetura global](../ARQUITETURA.md) e os [contratos entre módulos](../CONTRATOS.md).
 
-Extração de PDF, OCR e tratamento de HTML pertencem ao Digitalizador em ../digitalizador/. O Digitalizador já extrai o perfil ENAM/FGV Tipo 1 em saída intermediária, conforme sua documentação. Os comandos atuais do Organizador continuam sem incluir questões novas ou alterar situações; esses recursos permanecem planejados.
+Extração de PDF, OCR e tratamento de HTML pertencem ao Digitalizador em ../digitalizador/. O Digitalizador já extrai o perfil ENAM/FGV Tipo 1 em saída intermediária, conforme sua documentação. A inclusão de questões novas a partir do contrato v2 está implementada em incorporar-extracao; alteração genérica de situações ainda é futura.
 
 ## Consulta pública para o Emissor
 
@@ -104,3 +104,7 @@ O Organizador prepara uma tarefa fundamentada para IA/harness e registra síntes
 ## Processamento padrão sem IA
 
 Os comandos descrever-questao e descrever-candidatos geram descritores por regras locais. O Digitalizador usa essa interface automaticamente. Consulte [ABORDAGEM.md](ABORDAGEM.md) para os limites e comandos. O modo de tarefa para IA/harness mencionado anteriormente permanece apenas como compatibilidade, sem integrar o fluxo padrão.
+
+## Inclusão automática de extrações
+
+Implementados `reservar-identidade`, `incorporar-extracao` e `recuperar`, além das operações descritas acima. Ver [contrato de incorporação](INCORPORACAO.md). O [pipeline portátil](../digitalizador/OPERACAO.md) fornece as entradas e percorre o fluxo; a gravação pertence ao Organizador. O índice continua restrito a temas; IDs existentes e bytes das linhas anteriores são preservados.

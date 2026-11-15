@@ -42,3 +42,5 @@ Mudanças de organização física devem preservar o conteúdo dos registros, me
 ## Preparação temática
 
 A abordagem da cobrança pertence ao Organizador; ler ABORDAGEM.md. O fluxo padrão gera descritores por regras locais sem IA, preservando evidências, autoria, versão e vínculo ao conteúdo. Distinguir a ocorrência lexical de uma análise semântica; usar Não identificado quando não houver regra aplicável. O modo histórico de tarefa para harness não integra a operação automática. Não alterar categorias nem IDs como efeito da análise.
+
+A incorporação de extrações v2 e a reserva de identidade já estão implementadas. Ler [INCORPORACAO.md](INCORPORACAO.md). Publicação usa estágio validado, marcador que bloqueia leitura parcial e recuperação por hashes. Todas as alterações do estágio devem usar atomico/replace; nunca modificar diretamente um arquivo ligado por hardlink ao acervo anterior.

@@ -113,7 +113,7 @@ Cada número original e destino aparecem uma vez por lote. Usar um lote por prov
 
 A impressão digital combina fonte, hashes dos documentos e números originais, independentemente do nome do lote, data e destinos locais. Reenviar esse mesmo conjunto com outro nome é recusado. Isso detecta lotes idênticos, não qualquer questão semanticamente repetida nem sobreposição parcial de lotes. Um futuro importador deverá conferir lotes anteriores **antes** de acrescentar questões.
 
-O lote é gravado em pasta temporária e publicado por renomeação. Metadados são validados em conjunto antes de substituir seu arquivo. As operações usam exclusão por `.base.lock`. Após uma interrupção, conferir o estado antes de remover um bloqueio restante. Nenhum dos comandos escreve em `dados/`.
+O lote é gravado em pasta temporária e publicado por renomeação. Metadados são validados em conjunto antes de substituir seu arquivo. As operações usam exclusão por `.base.lock`. Após uma interrupção, conferir o estado antes de remover um bloqueio restante. Esses comandos auxiliares não acrescentam linhas em `dados/`. A inclusão via incorporar-extracao é documentada separadamente em INCORPORACAO.md.
 
 ## Migração dos formatos anteriores
 
@@ -135,3 +135,9 @@ Os manifestos e o exemplo deste repositório já estão migrados. Não há coman
 ## Abordagem da cobrança
 
 Campo opcional abordagem, com critério versionado, hash do contexto, síntese, conteúdo exigido, recorte específico, conceitos, raciocínio, estrutura, evidências e autoria. O contrato e os comandos estão em [ABORDAGEM.md](ABORDAGEM.md). Reanálises explícitas preservam historico_abordagens. A extensão é compatível com o formato 3: registros anteriores sem perfil permanecem válidos.
+
+## Incorporação e ficha de prova
+
+`incorporar-extracao` acrescenta questões e metadados em uma publicação recuperável, com validação prévia e preservação de IDs. `origens[].ficha_prova` aponta para `provas/ORGAO/CARGO/SHA_PROVA.json`; a ficha guarda identificação detalhada, documentos locais por hash e mapeamento para números originais. O validador confere referências locais e grupo da ficha. Detalhes em [INCORPORACAO.md](INCORPORACAO.md). Extensão auxiliar compatível com o formato 3; bases antigas sem esse campo continuam válidas.
+
+Para extrações v2 ENAM, o original PDF e páginas integrais em PNG permanecem disponíveis. Recursos com posição original são material para conferência e não simulam inserção da figura no texto. Classificação temática não confirmada fica em Não classificado; avisos não são apagados para registrar um lote tecnicamente incorporado.

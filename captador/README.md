@@ -68,7 +68,7 @@ O Emissor utiliza essa CLI, sem importar código interno. Endpoints da interface
 
 ## Entrega e limites
 
-Os lotes são a entrada do Digitalizador. A área de captação mostra documentos, hashes e vínculos; após processamento, a interface apresenta a prévia das questões extraídas. A extração ENAM/FGV Tipo 1 e a leitura do gabarito são executadas pelo Digitalizador. OCR e incorporação ao acervo ainda não foram implementados. A interface oferece processamento real do perfil suportado e apresenta suas pendências.
+Os lotes são a entrada do Digitalizador. A área de captação mostra documentos, hashes e vínculos; após processamento, a interface apresenta a prévia das questões extraídas. A extração ENAM/FGV Tipo 1 e a leitura do gabarito são executadas pelo Digitalizador. OCR permanece futuro; a incorporação já é feita pelo Organizador no pipeline CLI. A interface oferece processamento real do perfil suportado e apresenta suas pendências.
 
 Depois da digitalização, o número original e o caderno permitirão associar a resposta à questão. No formato definitivo, o gabarito fica na chave da questão em TEMA_md.json: por exemplo, `"12": {"gabarito": {"situacao":"definitivo","alternativas_corretas":[3],"rotulos_originais":["C"]}}`, além dos demais campos obrigatórios. A posição 3 significa terceira assertiva local, contada a partir de 1. Nenhuma resposta é inferida pelo Captador.
 
@@ -99,7 +99,7 @@ Na CLI, `encaminhar` recebe `{"lote":"UUID","gabarito_sha256":"HASH"}` via entra
 
 O pacote versionado é salvo em `encaminhamentos/HASH.json`, dentro da pasta de trabalho. Sua identidade deriva da identificação e dos documentos selecionados; repetir a mesma entrega não duplica o arquivo nem o evento no histórico. O pacote contém o protocolo, lote, identificação e descritores da prova/gabarito/complementos, com raiz_originais relativa à pasta de trabalho. O manifesto registra o encaminhamento e um evento datado.
 
-A fila pertence ao Captador; o futuro Digitalizador deverá consumir o contrato público, conferir a integridade e o encaminhamento atual do lote antes de processá-lo. Criar um pacote não executa o Digitalizador. A recepção de novo documento invalida o encaminhamento atual e a análise atual; os eventos e pacotes antigos permanecem históricos e exigem novo encaminhamento para a versão atual.
+A fila pertence ao Captador; o Digitalizador deve consumir o contrato público, conferir a integridade e o encaminhamento atual do lote antes de processá-lo. Criar um pacote não executa o Digitalizador. A recepção de novo documento invalida o encaminhamento atual e a análise atual; os eventos e pacotes antigos permanecem históricos e exigem novo encaminhamento para a versão atual.
 
 ## Registro de análise e migração
 
@@ -116,3 +116,11 @@ Na interface, use Buscar links de prova e gabarito para uma página HTML ou Baix
 A CLI descobrir recebe {"url":"https://…"}. anexar também aceita url em vez de entrada/conteudo_base64, mantendo nome, tipo e lote. O download aceita apenas HTTPS público, sem credenciais no endereço, limita tamanho e redirecionamentos e verifica cada destino. Respeita proxy HTTP confiável configurado no sistema para túnel HTTPS; credenciais do proxy não são registradas. Origem e URL final ficam no descritor. Download não interpreta o conteúdo como instrução.
 
 A operação pública entrega retorna apenas um pacote atual, completo e íntegro. registrar_extracao registra o resultado programático no histórico e no estado do lote; não equivale a registrar_analise manual. Novos documentos invalidam o encaminhamento e a extração atuais. Essas operações são usadas pelo Digitalizador, e não expostas como edição arbitrária da base definitiva.
+
+## Receber URLs/pasta em lote
+
+A [operação portátil](../digitalizador/OPERACAO.md) usa os comandos `receber` e `preparar-reserva`. O primeiro reserva todos os pares da página Qconcursos ou da pasta, sem extrair conteúdo; o segundo prepara um lote completo, identificado e vinculado para encaminhamento. A convenção `NOME_cad.pdf` / `NOME_gab.pdf` declara o vínculo. `estado` inclui também reservas, além dos lotes.
+
+Reservas ficam em `reservados/ID/registro.json`, `conteudo_cad.pdf` e `conteudo_gab.pdf`, dentro da raiz configurada. Não apagam as entradas. Falhas de download são registradas e podem ser retomadas. URLs já reservadas preservam seus bytes; para novas versões de um arquivo no mesmo endereço usar recepção explícita, sem sobrescrever a reserva anterior. Cada página informada tem seus próprios cartões; não há paginação implícita. Para dois PDFs diretos genéricos, usar prova_url/gabarito_url no pedido; pares de URLs `_cad/_gab` e caminhos arquivo_prova/arquivo_gabarito do Qconcursos são reconhecidos.
+
+No workflow, o Captador roda no runner e suas pastas acompanham o artefato `acervo-processado`. No desktop, tudo fica local. Hash previamente conferido pode identificar condição do gabarito; os demais exigem declaração preliminar/definitivo. Identidade ENAM inferida de título/nome é proposta: a capa será conferida pelo Digitalizador. Para nomes genéricos, informar identidade no pedido.

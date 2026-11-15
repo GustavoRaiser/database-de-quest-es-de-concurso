@@ -156,3 +156,9 @@ Arquivos por tema facilitam a localização, mas não garantem tamanho máximo. 
 Não dividir fisicamente um tema já cadastrado sem especificar antes como preservar sua numeração. Essa extensão não integra a versão 3.
 
 Manter JSONL sem compressão durante a edição local. Backups podem ser comprimidos. Medir volume e acesso com dados reais antes de acrescentar compressão de trabalho, banco de dados ou deduplicação.
+
+## 12. Incorporação implementada
+
+A operação incorporar-extracao recebe candidatos v2 e inclui o conjunto validado com publicação recuperável; reservar-identidade disponibiliza códigos de órgão/cargo e a incorporação cadastra disciplinas/temas conforme regras explícitas. Ver [INCORPORACAO.md](INCORPORACAO.md). Não altera a versão dos registros nem IDs por linha.
+
+Leitores próprios devem recusar a base quando existir .transacao-pendente.json e conferir .revisao.json antes/depois da leitura, repetindo se mudou ou surgiu um marcador. Preferir a CLI pública, que já aplica essa barreira. Ler arquivos diretamente sem esse protocolo pode observar uma publicação parcial.

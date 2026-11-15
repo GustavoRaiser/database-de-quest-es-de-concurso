@@ -94,3 +94,7 @@ Todas essas etapas são recomendações de planejamento. Não implementar automa
 ## Diretriz operacional atualizada — processamento sem IA
 
 O usuário definiu que o processamento dos dados deve ocorrer por programas no servidor/host/computador, sem chamadas a IA. A IA em CLI/harness é uma possível consumidora posterior do acervo e uma auxiliar de desenvolvimento. A operação atual usa extração de PDF, regras configuradas e cálculos determinísticos. Não apresentar descritores lexicais como conhecimento exigido inferido semanticamente. Preservar Não identificado e pendências quando a regra não oferecer evidência suficiente.
+
+## Atualização operacional — 15/11/2026
+
+A incorporação de extrações ENAM/FGV Tipo 1 já preserva ficha durável em provas/ORGAO/CARGO/SHA_PROVA.json, referenciada nos metadados da questão e acompanhada de documentos locais e mapeamento dos números originais. Pipeline CLI e GitHub Actions percorrem da recepção à base, com temas Não classificado onde não há confirmação. Isso implementa parte das prioridades acima; não implementa estatísticas, classificação semântica, precisão mensal nova, fusão de cadernos, Compilador ou comparação com apostilas. Ver organizador/INCORPORACAO.md e digitalizador/OPERACAO.md.

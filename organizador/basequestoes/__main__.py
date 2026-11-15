@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+import subprocess
 
 from .core import Base, Erro, ler_json
 from .emissao import emitir, FILTROS
@@ -15,6 +16,9 @@ def main():
     sub = parser.add_subparsers(dest="comando", required=True)
     sub.add_parser("validar")
     sub.add_parser("catalogos")
+    sub.add_parser('reservar-identidade', help='JSON stdin com nomes de órgão e cargo')
+    sub.add_parser('incorporar-extracao', help='JSON stdin com resultado, captacoes e situacao_inicial')
+    sub.add_parser('recuperar', help='retoma incorporação interrompida')
     sub.add_parser('descrever-candidatos', help='recebe lista JSON pela entrada padrão e aplica regras locais')
     descrever_questao = sub.add_parser('descrever-questao', help='descritor por regras locais, sem IA')
     descrever_questao.add_argument('id')
@@ -43,6 +47,16 @@ def main():
     lote.add_argument("arquivo", help="JSON com manifesto e relatorio de questões já cadastradas")
     args = parser.parse_args()
     try:
+        if args.comando in ('reservar-identidade','incorporar-extracao','recuperar'):
+            from .incorporacao import reservar, incorporar
+            from .transacoes import recuperar
+            if args.comando == 'recuperar':
+                resultado = recuperar(args.base)
+            else:
+                entrada = json.load(sys.stdin)
+                resultado = (reservar if args.comando == 'reservar-identidade' else incorporar)(args.base,entrada)
+            print(json.dumps(resultado,ensure_ascii=False,indent=2))
+            return 0
         base = Base(args.base)
         if args.comando == "validar":
             resultado = base.validar()
@@ -80,9 +94,10 @@ def main():
             if not isinstance(entrada, dict) or set(entrada) != {"manifesto", "relatorio"}:
                 raise Erro("fornecer objeto com manifesto e relatorio")
             resultado = {"lote": base.registrar_lote(entrada["manifesto"], entrada["relatorio"])}
+        base.conferir_leitura()
         print(json.dumps(resultado, ensure_ascii=False, indent=2))
         return 0
-    except (Erro, OSError) as exc:
+    except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as exc:
         print(f"Erro: {exc}", file=sys.stderr)
         return 1
 

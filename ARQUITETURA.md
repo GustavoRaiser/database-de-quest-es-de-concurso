@@ -8,7 +8,7 @@ Missão: definir e manter a organização da base e permitir que ferramentas enc
 
 Possui o contrato do armazenamento definitivo: hierarquia, IDs, JSONL, metadados _md.json, arquivos de recursos e registros de lotes. Seu código, documentação, testes e exemplos ficam em organizador/.
 
-Já implementa consulta, validação, armazenamento de recursos, registro de metadados e registro de lotes referentes a questões existentes. Cadastro de categorias, inclusão de novas questões e atualização de situação via comando ainda estão planejados. Portanto, ele é um sistema de organização de dados com ferramentas auxiliares; não é um digitalizador nem uma plataforma de resolução de questões.
+Já implementa consulta, validação, armazenamento de recursos, registro de metadados e registro de lotes referentes a questões existentes. Reserva de órgão/cargo e inclusão de novas questões via incorporar-extracao estão implementadas, com publicação recuperável. Atualização de situação por comando genérico permanece planejada. Portanto, ele é um sistema de organização de dados com ferramentas auxiliares; não é um digitalizador nem uma plataforma de resolução de questões.
 
 A base principal vazia tem seu manifesto na raiz do módulo organizador/. A amostra em organizador/exemplos/base/ é outra base, independente. Caminhos dentro dos manifestos são relativos à base correspondente.
 
@@ -38,7 +38,7 @@ Organizador: validação + armazenamento + ID local por linha
 Emissor: consulta e visualização conjunta de questão, metadados e recursos
 ```
 
-A extração do perfil ENAM/FGV Tipo 1 já está ligada à captação e à interface. A inclusão definitiva de questões ainda precisa ser implementada. Não há etapa obrigatória de revisão jurídica nem agente de atualização automática. A desatualização é informada manualmente pelo usuário.
+A extração do perfil ENAM/FGV Tipo 1 já está ligada à captação e à interface. O pipeline já chama o Organizador para incorporação definitiva de extrações v2 sem bloqueios técnicos; temas incertos ficam Não classificado. Não há etapa obrigatória de revisão jurídica nem agente de atualização automática. A desatualização é informada manualmente pelo usuário.
 
 ## Organização física de um tema
 
@@ -69,3 +69,5 @@ A preparação temática do Organizador agora fornece uma tarefa de abordagem à
 ## Operação por código no host
 
 A cadeia de URL/arquivos até extração e descritores locais funciona sem IA para o perfil suportado. O Emissor apresenta a prévia; o acervo definitivo é preservado. Descritores lexicais não são equiparados a interpretação semântica. Interfaces históricas para harness não são chamadas nesse fluxo.
+
+O workflow GitHub Actions e o desktop executam as mesmas CLIs. Captador reserva fontes no ambiente receptor; Digitalizador coordena o percurso e Organizador publica a base. Artefatos não são sincronizados entre ambientes sem uma transferência explícita. Ver [operação](digitalizador/OPERACAO.md).
